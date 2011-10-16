@@ -1,0 +1,61 @@
+buildscript {
+    repositories {
+        mavenRepo urls: 'http://internal-repo.springsource.org/plugins-release'
+    }
+    dependencies {
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.0.6'
+    }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'artifactory'
+apply plugin: 'maven'
+
+group = 'org.springframework.build.bundlor'
+version = '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenRepo urls: 'https://internal-repo.springsource.org/libs-release'
+}
+
+dependencies {
+    groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.3'
+    compile gradleApi()
+}
+
+repoUser = project.properties['REPO_USERNAME']
+repoPass = project.properties['REPO_PASSWORD']
+
+gradle.taskGraph.whenReady {taskGraph ->
+    if (taskGraph.hasTask(':artifactoryPublish') &&
+            (repoUser == null || repoPass == null)) {
+        throw new InvalidUserDataException(
+            "Please provide REPO_USERNAME and REPO_PASSWORD properties")
+    }
+}
+
+artifactory {
+    contextUrl = 'https://internal-repo.springsource.org'
+    publish {
+        repository {
+            repoKey = 'plugins-snapshot-local'
+            username = repoUser
+            password = repoPass
+        }
+        defaults {
+            publishConfigs('archives')
+        }
+    }
+    resolve {
+        repository {
+            repoKey = 'libs-releases'
+            username = repoUser
+            password = repoPass
+            maven = true
+        }
+    }
+}
+
+task wrapper(type:Wrapper) {
+    distributionUrl='http://repo.gradle.org/gradle/distributions-snapshots/gradle-1.0-milestone-3-bin.zip'
+}
