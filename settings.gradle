@@ -1,1 +1,2 @@
 include 'gradle-bundlor-plugin'
+include 'gradle-docbook-plugin'
