@@ -86,5 +86,5 @@ artifactory {
 
 task wrapper(type:Wrapper) {
     jarFile = ".wrapper/gradle-wrapper.jar";
-    distributionUrl='http://repo.gradle.org/gradle/distributions-snapshots/gradle-1.0-milestone-3-bin.zip'
+    gradleVersion='1.0-milestone-5'
 }
