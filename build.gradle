@@ -1,22 +1,9 @@
-buildscript {
-    repositories {
-        mavenRepo urls: 'http://internal-repo.springsource.org/plugins-release'
-    }
-    dependencies {
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.0.6'
-    }
-}
-
-allprojects {
-    apply plugin: 'artifactory'
-}
-
 subprojects {
     apply plugin: 'groovy'
     apply plugin: 'maven'
 
     repositories {
-        mavenRepo urls: 'https://internal-repo.springsource.org/libs-release'
+        mavenRepo url: 'https://repo.springsource.org/libs-release'
     }
 
     dependencies {
@@ -49,42 +36,4 @@ project(':gradle-docbook-plugin') {
                 'org.apache.xmlgraphics:batik-svg-dom:1.7@jar',
                 'org.apache.avalon.framework:avalon-framework-api:4.3.1'
     }
-}
-
-repoUser = project.properties['REPO_USERNAME']
-repoPass = project.properties['REPO_PASSWORD']
-
-gradle.taskGraph.whenReady {taskGraph ->
-    if (taskGraph.hasTask(':artifactoryPublish') &&
-            (repoUser == null || repoPass == null)) {
-        throw new InvalidUserDataException(
-            "Please provide REPO_USERNAME and REPO_PASSWORD properties")
-    }
-}
-
-artifactory {
-    contextUrl = 'https://internal-repo.springsource.org'
-    publish {
-        repository {
-            repoKey = 'plugins-snapshot-local'
-            username = repoUser
-            password = repoPass
-        }
-        defaults {
-            publishConfigs('archives')
-        }
-    }
-    resolve {
-        repository {
-            repoKey = 'libs-releases'
-            username = repoUser
-            password = repoPass
-            maven = true
-        }
-    }
-}
-
-task wrapper(type:Wrapper) {
-    jarFile = ".wrapper/gradle-wrapper.jar";
-    gradleVersion='1.0-milestone-5'
 }
