@@ -1,9 +1,9 @@
 buildscript {
     repositories {
-        mavenRepo urls: 'http://internal-repo.springsource.org/plugins-release'
+        mavenRepo urls: 'http://repo.springsource.org/plugins-snapshot'
     }
     dependencies {
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.0.6'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.0.x-SNAPSHOT'
     }
 }
 
@@ -16,7 +16,7 @@ subprojects {
     apply plugin: 'maven'
 
     repositories {
-        mavenRepo urls: 'https://internal-repo.springsource.org/libs-release'
+        mavenRepo urls: 'https://repo.springsource.org/libs-release'
     }
 
     dependencies {
@@ -63,7 +63,7 @@ gradle.taskGraph.whenReady {taskGraph ->
 }
 
 artifactory {
-    contextUrl = 'https://internal-repo.springsource.org'
+    contextUrl = 'https://repo.springsource.org'
     publish {
         repository {
             repoKey = 'plugins-snapshot-local'
