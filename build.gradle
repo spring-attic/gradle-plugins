@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        mavenRepo urls: 'http://repo.springsource.org/plugins-snapshot'
+        mavenRepo url: 'https://repo.springsource.org/plugins-snapshot'
     }
     dependencies {
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.0.x-SNAPSHOT'
@@ -14,14 +14,16 @@ allprojects {
 subprojects {
     apply plugin: 'groovy'
     apply plugin: 'maven'
+    apply plugin: 'eclipse'
 
     repositories {
-        mavenRepo urls: 'https://repo.springsource.org/libs-release'
+        mavenRepo url: 'https://repo.springsource.org/libs-release'
     }
 
     dependencies {
-        groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.3'
+        //groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.3'
         compile gradleApi()
+        groovy localGroovy()
     }
 }
 
