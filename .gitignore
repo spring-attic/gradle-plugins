@@ -2,3 +2,7 @@
 build
 !src/main/groovy/org/springframework/build
 *.sw?
+.classpath
+.project
+.settings
+bin
