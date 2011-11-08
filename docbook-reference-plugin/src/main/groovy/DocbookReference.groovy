@@ -52,9 +52,18 @@ class DocbookReferencePlugin implements Plugin<Project> {
         def single = tasks.add("referenceHtmlSingle", HtmlSingleDocbookReferenceTask)
         def pdf = tasks.add("referencePdf", PdfDocbookReferenceTask)
 
-        tasks.add("reference") {
+        def reference = tasks.add("reference") {
             description = "Generates HTML and PDF reference documentation."
             dependsOn([multi, single, pdf])
+
+            @InputDirectory
+            File sourceDir // e.g. 'src/reference'
+        }
+
+        project.gradle.taskGraph.whenReady {
+            if (multi.sourceDir == null) multi.sourceDir = reference.sourceDir
+            if (single.sourceDir == null) single.sourceDir = reference.sourceDir
+            if (pdf.sourceDir == null) pdf.sourceDir = reference.sourceDir
         }
 
     }
@@ -62,7 +71,8 @@ class DocbookReferencePlugin implements Plugin<Project> {
 }
 
 abstract class AbstractDocbookReferenceTask extends DefaultTask {
-    File sourceDirectory = new File(project.getProjectDir(), "build/reference-work");
+    @InputDirectory
+    File sourceDir // e.g. 'src/reference'
 
     @Input
     String sourceFileName = 'index.xml';
@@ -89,14 +99,14 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
                 logging.captureStandardError(LogLevel.INFO)
         }
 
-        preprocessDocbookSources() // TODO call once and only once
-        unpack()                   // TODO call only once
+        sourceDir = filterDocbookSources(sourceDir) // TODO call only once
+        unpack()                                    // TODO call only once
 
         SAXParserFactory factory = new org.apache.xerces.jaxp.SAXParserFactoryImpl();
         factory.setXIncludeAware(true);
         docsDir.mkdirs();
 
-        File srcFile = new File(sourceDirectory, sourceFileName);
+        File srcFile = new File(sourceDir, sourceFileName);
         String outputFilename = srcFile.getName().substring(0, srcFile.getName().length() - 4) + '.' + this.getExtension();
 
         File oDir = new File(getDocsDir(), xdir)
@@ -133,24 +143,29 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
         copyImagesAndCss(project, xdir)
     }
 
-    private void preprocessDocbookSources() {
-        docbookSrcDir = new File('src/docbook')
-        docbookWorkDir = new File('build/reference-work')
+    /**
+     * @param sourceDir directory of unfiltered sources
+     * @return directory of filtered sources
+     */
+    private File filterDocbookSources(File sourceDir) {
+        docbookWorkDir = new File("${project.buildDir}/reference-work")
 
         docbookWorkDir.mkdirs()
 
         // copy everything but index.xml
         project.copy {
             into(docbookWorkDir)
-            from(docbookSrcDir) { exclude '**/index.xml' }
+            from(sourceDir) { exclude '**/index.xml' }
         }
         // copy index.xml and expand ${...} variables along the way
         // e.g.: ${version} needs to be replaced in the header
         project.copy {
             into(docbookWorkDir)
-            from(docbookSrcDir) { include '**/index.xml' }
+            from(sourceDir) { include '**/index.xml' }
             expand(version: "${project.version}")
         }
+
+        return docbookWorkDir
     }
 
     private void unpack() {
@@ -218,7 +233,7 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
     private void copyImagesAndCss(def project, def dir) {
         project.copy {
             into "${project.buildDir}/reference/${dir}/images"
-            from "src/docbook/images" // SI specific
+            from "${sourceDir}/images" // SI specific
         }
         project.copy {
             into "${project.buildDir}/reference/${dir}/images"
