@@ -1,6 +1,6 @@
 .gradle
 build
-!src/main/groovy/org/springframework/build
+!*/src/*/*/org/springframework/build
 *.sw?
 .classpath
 .project

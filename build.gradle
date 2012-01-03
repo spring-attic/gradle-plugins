@@ -1,9 +1,9 @@
 buildscript {
     repositories {
-        mavenRepo url: 'https://repo.springsource.org/plugins-snapshot'
+        maven { url 'https://repo.springsource.org/plugins-release' }
     }
     dependencies {
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.0.x-SNAPSHOT'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.0.7'
     }
 }
 
@@ -16,25 +16,25 @@ subprojects {
     apply plugin: 'maven'
     apply plugin: 'eclipse'
 
+    group = 'org.springframework.build.gradle'
+
     repositories {
-        mavenRepo url: 'https://repo.springsource.org/libs-release'
+        maven { url 'https://repo.springsource.org/libs-release' }
     }
 
     dependencies {
-        //groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.3'
         compile gradleApi()
         groovy localGroovy()
     }
 }
 
 project(':gradle-bundlor-plugin') {
-    group = 'org.springframework.build.bundlor'
-    version = '1.0.0-SNAPSHOT'
+    dependencies {
+    }
 }
 
+/*
 project(':gradle-docbook-plugin') {
-    group = 'org.springframework.build.docbook'
-    version = '1.0.0-SNAPSHOT'
     dependencies {
         compile 'org.apache.xerces:resolver:2.9.1',
                 'saxon:saxon:6.5.3',
@@ -52,12 +52,13 @@ project(':gradle-docbook-plugin') {
                 'org.apache.avalon.framework:avalon-framework-api:4.3.1'
     }
 }
+*/
 
 repoUser = project.properties['REPO_USERNAME']
 repoPass = project.properties['REPO_PASSWORD']
 
 gradle.taskGraph.whenReady {taskGraph ->
-    if (taskGraph.hasTask(':artifactoryPublish') &&
+    if (taskGraph.hasTask(':docbook-reference-plugin:artifactoryPublish') &&
             (repoUser == null || repoPass == null)) {
         throw new InvalidUserDataException(
             "Please provide REPO_USERNAME and REPO_PASSWORD properties")
@@ -88,5 +89,5 @@ artifactory {
 
 task wrapper(type:Wrapper) {
     jarFile = ".wrapper/gradle-wrapper.jar";
-    gradleVersion='1.0-milestone-5'
+    gradleVersion='1.0-milestone-6'
 }
