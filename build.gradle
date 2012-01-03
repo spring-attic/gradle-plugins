@@ -60,8 +60,8 @@ repoPass = project.properties['REPO_PASSWORD']
 gradle.taskGraph.whenReady {taskGraph ->
     if (taskGraph.hasTask(':docbook-reference-plugin:artifactoryPublish') &&
             (repoUser == null || repoPass == null)) {
-        throw new InvalidUserDataException(
-            "Please provide REPO_USERNAME and REPO_PASSWORD properties")
+        logger.warn("WARNING: artifactoryPublish task specified but REPO_USERNAME " +
+            "and REPO_PASSWORD properties have not been provided. Authorization may fail.")
     }
 }
 
