@@ -29,6 +29,7 @@ subprojects {
 }
 
 project(':gradle-bundlor-plugin') {
+    version = gradleBundlorPluginVersion
 }
 
 /*
