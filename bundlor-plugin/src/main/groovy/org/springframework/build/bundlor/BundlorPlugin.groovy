@@ -94,7 +94,7 @@ public class BundlorPlugin implements Plugin<Project> {
                 // execute the ant task, and write out the manifest file
                 project.ant.bundlor(
                         enabled: enabled,
-                        inputPath: project.output.classesDir,
+                        inputPath: project.sourceSets.main.output.classesDir,
                         outputPath: outputDir,
                         bundleVersion: bundleVersion,
                         failOnWarnings: failOnWarnings) {
