@@ -2,7 +2,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 
 group = 'org.springframework.build.docbook'
-version = '0.1.0-SNAPSHOT'
+version = docbookReferencePluginVersion
 
 repositories {
     mavenCentral()
