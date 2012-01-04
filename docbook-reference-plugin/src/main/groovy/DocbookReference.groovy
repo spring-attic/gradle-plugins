@@ -56,14 +56,21 @@ class DocbookReferencePlugin implements Plugin<Project> {
             description = "Generates HTML and PDF reference documentation."
             dependsOn([multi, single, pdf])
 
-            @InputDirectory
             File sourceDir // e.g. 'src/reference'
+
+            File outputDir = new File(project.buildDir, "reference")
+
+            outputs.dir outputDir
         }
 
         project.gradle.taskGraph.whenReady {
             if (multi.sourceDir == null) multi.sourceDir = reference.sourceDir
             if (single.sourceDir == null) single.sourceDir = reference.sourceDir
             if (pdf.sourceDir == null) pdf.sourceDir = reference.sourceDir
+
+            if (multi.outputDir == null) multi.outputDir = reference.outputDir
+            if (single.outputDir == null) single.outputDir = reference.outputDir
+            if (pdf.outputDir == null) pdf.outputDir = reference.outputDir
         }
 
     }
@@ -83,7 +90,7 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
     String xdir;
 
     @OutputDirectory
-    File docsDir = new File(project.getBuildDir(), "reference");
+    File outputDir = new File(project.getBuildDir(), "reference");
 
     @TaskAction
     public final void transform() {
@@ -104,12 +111,12 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
 
         SAXParserFactory factory = new org.apache.xerces.jaxp.SAXParserFactoryImpl();
         factory.setXIncludeAware(true);
-        docsDir.mkdirs();
+        outputDir.mkdirs();
 
         File srcFile = new File(sourceDir, sourceFileName);
         String outputFilename = srcFile.getName().substring(0, srcFile.getName().length() - 4) + '.' + this.getExtension();
 
-        File oDir = new File(getDocsDir(), xdir)
+        File oDir = new File(outputDir, xdir)
         File outputFile = new File(oDir, outputFilename);
 
         Result result = new StreamResult(outputFile.getAbsolutePath());
