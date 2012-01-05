@@ -29,6 +29,7 @@ subprojects {
 }
 
 project(':bundlor-plugin') {
+    // dependencies are configured within BundlorPlugin
 }
 
 project(':docbook-reference-plugin') {
