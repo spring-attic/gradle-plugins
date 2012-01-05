@@ -33,7 +33,7 @@ project(':bundlor-plugin') {
 }
 
 project(':docbook-reference-plugin') {
-    version = property('docbook-reference-plugin-version')
+    version = docbookReferencePluginVersion
 
     dependencies {
         compile 'net.sf.docbook:docbook-xsl:1.75.2:resources@zip'
