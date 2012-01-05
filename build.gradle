@@ -34,6 +34,7 @@ project(':bundlor-plugin') {
 }
 
 project(':docbook-reference-plugin') {
+    version = docbookPluginVersion
     dependencies {
         compile 'net.sf.docbook:docbook-xsl:1.75.2:resources@zip'
         compile 'org.apache.xerces:resolver:2.9.1'
