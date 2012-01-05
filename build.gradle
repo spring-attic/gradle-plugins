@@ -29,6 +29,7 @@ subprojects {
 }
 
 project(':bundlor-plugin') {
+    version = bundlorPluginVersion
     // dependencies are configured within BundlorPlugin
 }
 
