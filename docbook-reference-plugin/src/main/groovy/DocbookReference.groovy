@@ -53,6 +53,7 @@ class DocbookReferencePlugin implements Plugin<Project> {
         def pdf = tasks.add("referencePdf", PdfDocbookReferenceTask)
 
         def reference = tasks.add("reference") {
+            group = 'Documentation'
             description = "Generates HTML and PDF reference documentation."
             dependsOn([multi, single, pdf])
 

@@ -25,6 +25,7 @@ public class BundlorPlugin implements Plugin<Project> {
 
         project.tasks.add("bundlor") {
             dependsOn project.compileJava
+            group = 'Build'
             description = 'Generates an OSGi-compatibile MANIFEST.MF file.'
 
             enabled = true
