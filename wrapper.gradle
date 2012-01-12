@@ -1,4 +1,5 @@
 task wrapper(type:Wrapper) {
     jarFile = ".wrapper/gradle-wrapper.jar"
-    gradleVersion='1.0-milestone-6'
+    gradleVersion = '1.0-milestone-8'
+    distributionUrl = 'http://repo.gradle.org/gradle/distributions-snapshots/gradle-1.0-milestone-8-20120112000036+0100-bin.zip'
 }

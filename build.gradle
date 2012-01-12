@@ -3,7 +3,7 @@ buildscript {
         maven { url 'https://repo.springsource.org/plugins-release' }
     }
     dependencies {
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.0.7'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.0.9'
     }
 }
 
