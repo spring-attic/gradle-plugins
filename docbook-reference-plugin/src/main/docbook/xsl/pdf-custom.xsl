@@ -451,7 +451,6 @@
 <!--###################################################
         colored and hyphenated links
     ################################################### -->
-<!--
     <xsl:template match="ulink">
         <fo:basic-link external-destination="{@url}"
                 xsl:use-attribute-sets="xref.properties"
@@ -483,5 +482,4 @@
             </xsl:choose>
         </fo:basic-link>
     </xsl:template>
--->
 </xsl:stylesheet>
