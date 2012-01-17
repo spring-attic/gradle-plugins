@@ -29,10 +29,10 @@ public class BundlorPlugin implements Plugin<Project> {
             description = 'Generates an OSGi-compatibile MANIFEST.MF file.'
 
             enabled = true
-            failOnWarnings = false
-            bundleName = null // this will be set below to project.description
+            failOnWarnings = true
+            bundleName = null
             bundleVersion = project.version
-            bundleVendor = 'Unspecified'
+            bundleVendor = 'SpringSource'
             bundleSymbolicName = null
             bundleManifestVersion = '2'
             importTemplate = []
@@ -98,6 +98,9 @@ public class BundlorPlugin implements Plugin<Project> {
                         bundleVersion: bundleVersion,
                         failOnWarnings: failOnWarnings) {
                     if (manifestTemplate == null) {
+                        assert bundleSymbolicName != null
+                        assert bundleVendor != null
+                        assert bundleName != null
                         manifestTemplate = """\
                             Bundle-Vendor: ${bundleVendor}
                             Bundle-Version: ${bundleVersion}
