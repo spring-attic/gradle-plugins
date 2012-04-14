@@ -57,9 +57,9 @@ class DocbookReferencePlugin implements Plugin<Project> {
             description = "Generates HTML and PDF reference documentation."
             dependsOn([multi, single, pdf])
 
-            File sourceDir // e.g. 'src/reference'
+            ext.sourceDir = null // e.g. new File('src/reference')
 
-            File outputDir = new File(project.buildDir, "reference")
+            ext.outputDir = new File(project.buildDir, "reference")
 
             outputs.dir outputDir
         }
@@ -156,7 +156,7 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
      * @return directory of filtered sources
      */
     private File filterDocbookSources(File sourceDir) {
-        docbookWorkDir = new File("${project.buildDir}/reference-work")
+        def docbookWorkDir = new File("${project.buildDir}/reference-work")
 
         docbookWorkDir.mkdirs()
 
