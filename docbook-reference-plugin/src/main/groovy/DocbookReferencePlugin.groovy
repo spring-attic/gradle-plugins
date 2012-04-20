@@ -213,7 +213,10 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
         }
     }
 
-    private CatalogManager createCatalogManager() {
+    // for some reason, statically typing the return value leads to the following
+    // error when Gradle tries to subclass the task class at runtime:
+    // java.lang.NoClassDefFoundError: org/apache/xml/resolver/CatalogManager
+    private Object createCatalogManager() {
         CatalogManager manager = new CatalogManager();
         manager.setIgnoreMissingProperties(true);
         ClassLoader classLoader = this.getClass().getClassLoader();
