@@ -24,21 +24,25 @@ public class BundlorPlugin implements Plugin<Project> {
         }
 
         project.tasks.add("bundlor") {
-            dependsOn project.compileJava
-            group = 'Build'
-            description = 'Generates an OSGi-compatibile MANIFEST.MF file.'
+			
+            ext {
+                dependsOn project.compileJava
+                group = 'Build'
+                description = 'Generates an OSGi-compatibile MANIFEST.MF file.'
 
-            enabled = true
-            failOnWarnings = true
-            bundleName = null
-            bundleVersion = project.version
-            bundleVendor = 'SpringSource'
-            bundleSymbolicName = null
-            bundleManifestVersion = '2'
-            importTemplate = []
-            manifestTemplate = null
+                enabled = true
+                failOnWarnings = true
+                bundleName = null
+                bundleVersion = project.version
+                bundleVendor = 'SpringSource'
+                bundleSymbolicName = null
+                bundleManifestVersion = '2'
+                importTemplate = []
+                manifestTemplate = null
 
-            outputDir = new File("${project.buildDir}/bundlor")
+                outputDir = new File("${project.buildDir}/bundlor")
+            }
+			
             def manifest = new File("${outputDir}/META-INF/MANIFEST.MF")
 
             // inform gradle what directory this task writes so that
