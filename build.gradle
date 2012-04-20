@@ -105,7 +105,7 @@ artifactory {
     contextUrl = 'https://repo.springsource.org'
     publish {
         repository {
-            repoKey = 'plugins-snapshot-local'
+            repoKey = 'plugins-release-local'
             username = repoUser
             password = repoPass
         }
