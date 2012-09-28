@@ -58,8 +58,8 @@ class DocbookReferencePlugin implements Plugin<Project> {
             dependsOn([multi, single, pdf])
 
             ext.sourceDir = null // e.g. new File('src/reference')
-
             ext.outputDir = new File(project.buildDir, "reference")
+            ext.pdfFilename = "${project.rootProject.name}-reference.pdf"
 
             outputs.dir outputDir
         }
@@ -364,7 +364,7 @@ class PdfDocbookReferenceTask extends AbstractDocbookReferenceTask {
     }
 
     private File getPdfOutputFile(File foFile) {
-        return new File(foFile.parent, this.project.rootProject.name + '-reference.pdf')
+        return new File(foFile.parent, project.reference.pdfFilename)
     }
 
 }
