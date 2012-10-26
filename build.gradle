@@ -123,8 +123,7 @@ artifactory {
     }
 }
 
-task wrapper(type:Wrapper) {
-    jarFile = ".wrapper/gradle-wrapper.jar";
-    gradleVersion='1.0-milestone-8a'
-    distributionUrl='http://services.gradle.org/distributions/gradle-1.0-milestone-8a-bin.zip'
+task wrapper(type: Wrapper) {
+    description = 'Generates gradlew[.bat] scripts'
+    gradleVersion = '1.1'
 }
