@@ -33,12 +33,12 @@
     <!-- Use code syntax highlighting -->
     <xsl:param name="highlight.source">1</xsl:param>
 
-<!-- Extensions -->
+    <!-- Extensions -->
     <xsl:param name="use.extensions">1</xsl:param>
     <xsl:param name="tablecolumns.extension">0</xsl:param>
     <xsl:param name="callout.extensions">1</xsl:param>
 
-<!-- Activate Graphics -->
+    <!-- Activate Graphics -->
     <xsl:param name="admon.graphics" select="1"/>
     <xsl:param name="admon.graphics.path">images/admon/</xsl:param>
     <xsl:param name="admon.graphics.extension">.png</xsl:param>
@@ -57,18 +57,18 @@
     <!-- Leave image paths as relative when navigating XInclude -->
     <xsl:param name="keep.relative.image.uris" select="1"/>
 
-<!-- Label Chapters and Sections (numbering) -->
+    <!-- Label Chapters and Sections (numbering) -->
     <xsl:param name="chapter.autolabel" select="1"/>
     <xsl:param name="section.autolabel" select="1"/>
-    <xsl:param name="section.autolabel.max.depth" select="2"/>
+    <xsl:param name="section.autolabel.max.depth" select="3"/>
 
     <xsl:param name="section.label.includes.component.label" select="1"/>
     <xsl:param name="table.footnote.number.format" select="'1'"/>
 
-<!-- Show only Sections up to level 2 in the TOCs -->
+    <!-- Show only Sections up to level 2 in the TOCs -->
     <xsl:param name="toc.section.depth">2</xsl:param>
 
-<!-- Remove "Chapter" from the Chapter titles... -->
+    <!-- Remove "Chapter" from the Chapter titles... -->
     <xsl:param name="local.l10n.xml" select="document('')"/>
     <l:i18n xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0">
         <l:l10n language="en">
