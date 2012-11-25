@@ -13,31 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.*;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.sax.SAXResult;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
+import java.util.zip.*
 
-import java.util.zip.*;
+import javax.xml.parsers.SAXParserFactory
+import javax.xml.transform.*
+import javax.xml.transform.sax.SAXResult
+import javax.xml.transform.sax.SAXSource
+import javax.xml.transform.stream.StreamResult
+import javax.xml.transform.stream.StreamSource
 
-import com.icl.saxon.TransformerFactoryImpl;
+import org.apache.fop.apps.*
+import org.apache.xml.resolver.CatalogManager
+import org.apache.xml.resolver.tools.CatalogResolver
+import org.gradle.api.*
+import org.gradle.api.logging.LogLevel
+import org.gradle.api.tasks.*
+import org.slf4j.LoggerFactory
+import org.xml.sax.InputSource
+import org.xml.sax.XMLReader
 
-import org.xml.sax.XMLReader;
-import org.xml.sax.InputSource;
-
-import org.apache.xml.resolver.CatalogManager;
-import org.apache.xml.resolver.tools.CatalogResolver;
-
-import org.apache.fop.apps.*;
-
-import org.gradle.api.logging.LogLevel;
-import org.gradle.api.*;
-import org.gradle.api.tasks.*;
-import org.gradle.api.artifacts.Configuration;
-
-import org.slf4j.LoggerFactory;
+import com.icl.saxon.TransformerFactoryImpl
 
 
 class DocbookReferencePlugin implements Plugin<Project> {
@@ -85,8 +80,7 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
     @Input
     String sourceFileName = 'index.xml';
 
-    //@InputFile
-    File stylesheet;
+    String stylesheet;
 
     String xdir;
 
@@ -108,7 +102,7 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
         }
 
         sourceDir = filterDocbookSources(sourceDir) // TODO call only once
-        unpack()                                    // TODO call only once
+        unpack()                                        // TODO call only once
 
         SAXParserFactory factory = new org.apache.xerces.jaxp.SAXParserFactoryImpl();
         factory.setXIncludeAware(true);
@@ -128,7 +122,12 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
         reader.setEntityResolver(resolver);
         TransformerFactory transformerFactory = new TransformerFactoryImpl();
         transformerFactory.setURIResolver(resolver);
-        URL url = stylesheet.toURL();
+
+        def File stylesheetFile = new File(new File(sourceDir, "xsl"), stylesheet);
+        if(!stylesheetFile.exists()) {
+            stylesheetFile = new File("${project.buildDir}/docbook-resources/xsl/${stylesheet}");
+        }
+        URL url = stylesheetFile.toURI().toURL();
         Source source = new StreamSource(url.openStream(), url.toExternalForm());
         Transformer transformer = transformerFactory.newTransformer(source);
 
@@ -156,24 +155,37 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
      * @return directory of filtered sources
      */
     private File filterDocbookSources(File sourceDir) {
-        def docbookWorkDir = new File("${project.buildDir}/reference-work")
-
-        docbookWorkDir.mkdirs()
+        def workDir = new File("${project.buildDir}/reference-work");
+        workDir.mkdirs();
 
         // copy everything but index.xml
         project.copy {
-            into(docbookWorkDir)
+            into(workDir)
             from(sourceDir) { exclude '**/index.xml' }
         }
+
         // copy index.xml and expand ${...} variables along the way
         // e.g.: ${version} needs to be replaced in the header
         project.copy {
-            into(docbookWorkDir)
+            into(workDir)
             from(sourceDir) { include '**/index.xml' }
             expand(version: "${project.version}")
         }
 
-        return docbookWorkDir
+        // Copy and process any custom titlepages
+        def titlePageWorkDir = new File(new File(workDir, "xsl"), "titlepage");
+        titlePageWorkDir.mkdirs();
+        Transformer transformer = new TransformerFactoryImpl().newTransformer(
+            new StreamSource(this.class.classLoader.getResourceAsStream("docbook/template/titlepage.xsl")));
+        transformer.setParameter("ns", "http://www.w3.org/1999/xhtml");
+        new File(sourceDir, "titlepage").eachFileMatch( ~/.*\.xml/, { f ->
+            File output = new File(titlePageWorkDir, f.name.replace(".xml", ".xsl"))
+            transformer.transform(new StreamSource(f), new StreamResult(output));
+            // Ugly hack to work around Java XSLT bug
+            output.setText(output.text.replaceFirst("xsl:stylesheet", "xsl:stylesheet xmlns:exsl=\"http://exslt.org/common\" "));
+        })
+
+        return workDir;
     }
 
     private void unpack() {
@@ -261,7 +273,7 @@ class HtmlSingleDocbookReferenceTask extends AbstractDocbookReferenceTask {
 
     public HtmlSingleDocbookReferenceTask() {
         setDescription('Generates single-page HTML reference documentation.')
-        stylesheet =  new File("${project.buildDir}/docbook-resources/xsl/html-single-custom.xsl")
+        stylesheet =  "html-single-custom.xsl";
         xdir = 'htmlsingle'
     }
 
@@ -276,7 +288,7 @@ class HtmlMultiDocbookReferenceTask extends AbstractDocbookReferenceTask {
 
     public HtmlMultiDocbookReferenceTask() {
         setDescription('Generates multi-page HTML reference documentation.')
-        stylesheet = new File("${project.buildDir}/docbook-resources/xsl/html-custom.xsl")
+        stylesheet = "html-custom.xsl";
         xdir = 'html'
     }
 
@@ -301,7 +313,7 @@ class PdfDocbookReferenceTask extends AbstractDocbookReferenceTask {
 
     public PdfDocbookReferenceTask() {
         setDescription('Generates PDF reference documentation.')
-        stylesheet = new File("${project.buildDir}/docbook-resources/xsl/pdf-custom.xsl")
+        stylesheet = "pdf-custom.xsl"
         xdir = 'pdf'
         admonGraphicsPath = "${project.buildDir}/docbook-resources/images/admon/"
     }
