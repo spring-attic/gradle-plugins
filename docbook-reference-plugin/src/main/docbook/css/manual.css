@@ -58,6 +58,12 @@ h4,h1 code,h5,h5 code,h6,h6 code {
 	font-size: 18px;
 }
 
+div.book {
+	min-width: 300px;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
 p.releaseinfo {
 	font-weight: bold;
 	margin-bottom: 50px;
