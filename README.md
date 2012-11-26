@@ -1,12 +1,14 @@
 ## Configuration
-As per [spring-framework/build.gradle][1]:
+See https://github.com/SpringSource/gradle-plugins/tags to determine the
+latest available version. Then configure the plugin in your project as
+follows, using [spring-framework/build.gradle][1] as an example:
 ```groovy
 buildscript {
     repositories {
         maven { url 'http://repo.springsource.org/plugins-release' }
     }
     dependencies {
-        classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.2.0'
+        classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.2.1'
     }
 }
 
