@@ -1,7 +1,7 @@
 ## Configuration
-See https://github.com/SpringSource/gradle-plugins/tags to determine the
+See [tags][1] to determine the
 latest available version. Then configure the plugin in your project as
-follows, using [spring-framework/build.gradle][1] as an example:
+follows, using [spring-framework/build.gradle][2] as an example:
 ```groovy
 buildscript {
     repositories {
@@ -41,7 +41,7 @@ configure(rootproject) {
     }
 }
 ```
-See contents of the [spring-framework/src/reference/docbook][2] for details.
+See contents of the [spring-framework/src/reference/docbook][3] for details.
 
 
 ## Usage
@@ -61,8 +61,9 @@ $ open build/reference/pdf/spring-framework-reference.pdf
 ```
 
 ## Maintenance
-See [How to release the docbook reference plugin][3] wiki page.
+See [How to release the docbook reference plugin][4] wiki page.
 
-[1]: https://github.com/SpringSource/spring-framework/blob/master/build.gradle
-[2]: https://github.com/SpringSource/spring-framework/tree/master/src/reference/docbook
-[3]: https://github.com/SpringSource/gradle-plugins/wiki/How-to-release-the-docbook-reference-plugin
+[1]: https://github.com/SpringSource/gradle-plugins/tags
+[2]: https://github.com/SpringSource/spring-framework/blob/master/build.gradle
+[3]: https://github.com/SpringSource/spring-framework/tree/master/src/reference/docbook
+[4]: https://github.com/SpringSource/gradle-plugins/wiki/How-to-release-the-docbook-reference-plugin
