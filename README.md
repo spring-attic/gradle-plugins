@@ -59,7 +59,7 @@ $ open build/reference/pdf/spring-framework-reference.pdf
 ```
 
 ## Maintenance
-See [How to release the docbook reference plugin] wiki page.
+See [How to release the docbook reference plugin][3] wiki page.
 
 [1]: https://github.com/SpringSource/spring-framework/blob/master/build.gradle
 [2]: https://github.com/SpringSource/spring-framework/tree/master/src/reference/docbook
