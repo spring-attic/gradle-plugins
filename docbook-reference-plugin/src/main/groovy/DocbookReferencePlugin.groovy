@@ -169,7 +169,7 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
         project.copy {
             into(workDir)
             from(sourceDir) { include '**/index.xml' }
-            expand(version: "${project.version}")
+            expand(version: "${project.version}", ext: project.ext)
         }
 
         // Copy and process any custom titlepages
