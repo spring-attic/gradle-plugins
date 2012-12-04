@@ -65,16 +65,8 @@ project(':docbook-reference-plugin') {
                 into project.buildDir
             }
 
-            copy { // copy admonition images into admon dir for backward compat
-                from "${project.buildDir}/docbook/images"
-                include '*.*'
-                into "${project.buildDir}/docbook/images/admon"
-            }
-
-            copy { // copy custom css and xsl from src/main
+            copy { // copy docbook resources from src/main
                 from 'src/main/docbook'
-                include 'css/**'
-                include 'xsl/**'
                 into "${project.buildDir}/docbook"
             }
         }

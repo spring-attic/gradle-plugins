@@ -58,7 +58,7 @@ h4,h1 code,h5,h5 code,h6,h6 code {
 	font-size: 18px;
 }
 
-div.book {
+div.book,div.chapter,div.appendix,div.part {
 	min-width: 300px;
 	max-width: 1200px;
 	margin: 0 auto;
@@ -66,12 +66,17 @@ div.book {
 
 p.releaseinfo {
 	font-weight: bold;
-	margin-bottom: 50px;
+	margin-bottom: 40px;
+	margin-top: 40px;
+}
+
+div.authorgroup {
+	line-height: 1;
 }
 
 p.copyright {
 	line-height: 1;
-	margin-bottom: 30px;
+	margin-bottom: -5px;
 }
 
 .legalnotice p {
@@ -83,8 +88,6 @@ p.copyright {
 div.titlepage+p,div.titlepage+p {
 	margin-top: 0;
 }
-
-div.titlepage
 
 pre {
 	line-height: 1.0;

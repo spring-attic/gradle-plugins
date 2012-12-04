@@ -101,8 +101,9 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
                 logging.captureStandardError(LogLevel.INFO)
         }
 
-        sourceDir = filterDocbookSources(sourceDir) // TODO call only once
-        unpack()                                        // TODO call only once
+		// TODO call only once
+        unpack()
+        sourceDir = filterDocbookSources(sourceDir)
 
         SAXParserFactory factory = new org.apache.xerces.jaxp.SAXParserFactoryImpl();
         factory.setXIncludeAware(true);
@@ -173,18 +174,20 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
         }
 
         // Copy and process any custom titlepages
-        def titlePageWorkDir = new File(new File(workDir, "xsl"), "titlepage");
-        titlePageWorkDir.mkdirs();
-        Transformer transformer = new TransformerFactoryImpl().newTransformer(
-            new StreamSource(this.class.classLoader.getResourceAsStream("docbook/template/titlepage.xsl")));
-        transformer.setParameter("ns", "http://www.w3.org/1999/xhtml");
-        new File(sourceDir, "titlepage").eachFileMatch( ~/.*\.xml/, { f ->
-            File output = new File(titlePageWorkDir, f.name.replace(".xml", ".xsl"))
-            transformer.transform(new StreamSource(f), new StreamResult(output));
-            // Ugly hack to work around Java XSLT bug
-            output.setText(output.text.replaceFirst("xsl:stylesheet", "xsl:stylesheet xmlns:exsl=\"http://exslt.org/common\" "));
-        })
-
+        File titlePageSource = new File(sourceDir, "titlepage")
+		if(titlePageSource.exists()) {
+	        def titlePageWorkDir = new File(new File(workDir, "xsl"), "titlepage");
+	        titlePageWorkDir.mkdirs();
+	        Transformer transformer = new TransformerFactoryImpl().newTransformer(
+	            new StreamSource(this.class.classLoader.getResourceAsStream("docbook/template/titlepage.xsl")));
+	        transformer.setParameter("ns", "http://www.w3.org/1999/xhtml");
+			titlePageSource.eachFileMatch( ~/.*\.xml/, { f ->
+	            File output = new File(titlePageWorkDir, f.name.replace(".xml", ".xsl"))
+	            transformer.transform(new StreamSource(f), new StreamResult(output));
+	            // Ugly hack to work around Java XSLT bug
+	            output.setText(output.text.replaceFirst("xsl:stylesheet", "xsl:stylesheet xmlns:exsl=\"http://exslt.org/common\" "));
+	        })
+    	}
         return workDir;
     }
 
@@ -256,15 +259,11 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
     private void copyImagesAndCss(def project, def dir) {
         project.copy {
             into "${project.buildDir}/reference/${dir}/images"
-            from "${sourceDir}/images" // SI specific
-        }
-        project.copy {
-            into "${project.buildDir}/reference/${dir}/images"
-            from "${project.buildDir}/docbook-resources/images" // Common
+            from "${project.buildDir}/docbook-resources/images"
         }
         project.copy {
             into "${project.buildDir}/reference/${dir}/css"
-            from "${project.buildDir}/docbook-resources/css" // Common
+            from "${project.buildDir}/docbook-resources/css"
         }
     }
 }
@@ -273,7 +272,7 @@ class HtmlSingleDocbookReferenceTask extends AbstractDocbookReferenceTask {
 
     public HtmlSingleDocbookReferenceTask() {
         setDescription('Generates single-page HTML reference documentation.')
-        stylesheet =  "html-single-custom.xsl";
+        stylesheet =  "html-singlepage.xsl";
         xdir = 'htmlsingle'
     }
 
@@ -288,7 +287,7 @@ class HtmlMultiDocbookReferenceTask extends AbstractDocbookReferenceTask {
 
     public HtmlMultiDocbookReferenceTask() {
         setDescription('Generates multi-page HTML reference documentation.')
-        stylesheet = "html-custom.xsl";
+        stylesheet = "html-multipage.xsl";
         xdir = 'html'
     }
 
@@ -309,24 +308,15 @@ class HtmlMultiDocbookReferenceTask extends AbstractDocbookReferenceTask {
 
 class PdfDocbookReferenceTask extends AbstractDocbookReferenceTask {
 
-    String admonGraphicsPath
-
     public PdfDocbookReferenceTask() {
         setDescription('Generates PDF reference documentation.')
-        stylesheet = "pdf-custom.xsl"
+        stylesheet = "pdf.xsl"
         xdir = 'pdf'
-        admonGraphicsPath = "${project.buildDir}/docbook-resources/images/admon/"
     }
 
     @Override
     protected String getExtension() {
         return 'fo'
-    }
-
-    @Override
-    protected void preTransform(Transformer transformer, File sourceFile, File outputFile) {
-        transformer.setParameter("admon.graphics", "1");
-        transformer.setParameter("admon.graphics.path", admonGraphicsPath);
     }
 
     /**
@@ -335,6 +325,7 @@ class PdfDocbookReferenceTask extends AbstractDocbookReferenceTask {
     @Override
     protected void postTransform(File foFile) {
         FopFactory fopFactory = FopFactory.newInstance();
+		fopFactory.setBaseURL(project.file("${project.buildDir}/docbook-resources").toURI().toURL().toExternalForm());
 
         OutputStream out = null;
         final File pdfFile = getPdfOutputFile(foFile);
@@ -349,6 +340,7 @@ class PdfDocbookReferenceTask extends AbstractDocbookReferenceTask {
             Transformer transformer = factory.newTransformer();
 
             Source src = new StreamSource(foFile);
+			src.setSystemId(foFile.toURI().toURL().toExternalForm());
 
             Result res = new SAXResult(fop.getDefaultHandler());
 
