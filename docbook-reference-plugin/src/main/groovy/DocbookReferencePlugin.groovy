@@ -101,7 +101,7 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
                 logging.captureStandardError(LogLevel.INFO)
         }
 
-		// TODO call only once
+        // TODO call only once
         unpack()
         sourceDir = filterDocbookSources(sourceDir)
 
@@ -175,19 +175,19 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
 
         // Copy and process any custom titlepages
         File titlePageSource = new File(sourceDir, "titlepage")
-		if(titlePageSource.exists()) {
-	        def titlePageWorkDir = new File(new File(workDir, "xsl"), "titlepage");
-	        titlePageWorkDir.mkdirs();
-	        Transformer transformer = new TransformerFactoryImpl().newTransformer(
-	            new StreamSource(this.class.classLoader.getResourceAsStream("docbook/template/titlepage.xsl")));
-	        transformer.setParameter("ns", "http://www.w3.org/1999/xhtml");
-			titlePageSource.eachFileMatch( ~/.*\.xml/, { f ->
-	            File output = new File(titlePageWorkDir, f.name.replace(".xml", ".xsl"))
-	            transformer.transform(new StreamSource(f), new StreamResult(output));
-	            // Ugly hack to work around Java XSLT bug
-	            output.setText(output.text.replaceFirst("xsl:stylesheet", "xsl:stylesheet xmlns:exsl=\"http://exslt.org/common\" "));
-	        })
-    	}
+        if(titlePageSource.exists()) {
+            def titlePageWorkDir = new File(new File(workDir, "xsl"), "titlepage");
+            titlePageWorkDir.mkdirs();
+            Transformer transformer = new TransformerFactoryImpl().newTransformer(
+                new StreamSource(this.class.classLoader.getResourceAsStream("docbook/template/titlepage.xsl")));
+            transformer.setParameter("ns", "http://www.w3.org/1999/xhtml");
+            titlePageSource.eachFileMatch( ~/.*\.xml/, { f ->
+                File output = new File(titlePageWorkDir, f.name.replace(".xml", ".xsl"))
+                transformer.transform(new StreamSource(f), new StreamResult(output));
+                // Ugly hack to work around Java XSLT bug
+                output.setText(output.text.replaceFirst("xsl:stylesheet", "xsl:stylesheet xmlns:exsl=\"http://exslt.org/common\" "));
+            })
+        }
         return workDir;
     }
 
@@ -325,7 +325,7 @@ class PdfDocbookReferenceTask extends AbstractDocbookReferenceTask {
     @Override
     protected void postTransform(File foFile) {
         FopFactory fopFactory = FopFactory.newInstance();
-		fopFactory.setBaseURL(project.file("${project.buildDir}/docbook-resources").toURI().toURL().toExternalForm());
+        fopFactory.setBaseURL(project.file("${project.buildDir}/docbook-resources").toURI().toURL().toExternalForm());
 
         OutputStream out = null;
         final File pdfFile = getPdfOutputFile(foFile);
@@ -340,7 +340,7 @@ class PdfDocbookReferenceTask extends AbstractDocbookReferenceTask {
             Transformer transformer = factory.newTransformer();
 
             Source src = new StreamSource(foFile);
-			src.setSystemId(foFile.toURI().toURL().toExternalForm());
+            src.setSystemId(foFile.toURI().toURL().toExternalForm());
 
             Result res = new SAXResult(fop.getDefaultHandler());
 
