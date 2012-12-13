@@ -259,6 +259,10 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
     private void copyImagesAndCss(def project, def dir) {
         project.copy {
             into "${project.buildDir}/reference/${dir}/images"
+            from "${sourceDir}/images"
+        }
+        project.copy {
+            into "${project.buildDir}/reference/${dir}/images"
             from "${project.buildDir}/docbook-resources/images"
         }
         project.copy {
