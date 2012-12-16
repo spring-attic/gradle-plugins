@@ -33,12 +33,6 @@ class PropDepsEclipsePlugin implements Plugin<Project> {
 		project.plugins.apply(PropDepsPlugin)
 		project.plugins.apply(EclipsePlugin)
 
-		// Include the provided and optional configurations
-		def configurations = [project.configurations.provided, project.configurations.optional];
-		project.eclipse.classpath {
-			plusConfigurations += configurations
-		}
-
 		// Ensure only the compile configuration is exported
 		project.eclipse.classpath.file {
 			whenMerged { classpath ->

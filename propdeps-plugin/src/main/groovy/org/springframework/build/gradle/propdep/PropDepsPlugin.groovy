@@ -48,6 +48,8 @@ class PropDepsPlugin implements Plugin<Project> {
 
 		Javadoc javadoc = project.tasks.getByName(JavaPlugin.JAVADOC_TASK_NAME)
 		javadoc.classpath = new UnionFileCollection(javadoc.classpath, provided, optional)
+
+		project.configurations.getByName("testRuntime").extendsFrom(provided, optional)
 	}
 
 	private Configuration addConfiguration(Project project, String name) {
