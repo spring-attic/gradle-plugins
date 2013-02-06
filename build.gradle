@@ -38,6 +38,7 @@ project(':docbook-reference-plugin') {
     dependencies {
         compile 'net.sf.docbook:docbook-xsl:1.75.2:resources@zip'
         compile 'net.sf.docbook:docbook-xml:5.0:xsd-resources@zip'
+        compile 'net.sf.docbook:docbook-xsl-saxon:1.0.0'
         compile 'org.apache.xerces:resolver:2.9.1'
         compile 'org.apache.xerces:xercesImpl:2.9.1'
         compile 'saxon:saxon:6.5.3'
