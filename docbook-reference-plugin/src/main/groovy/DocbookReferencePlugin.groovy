@@ -159,17 +159,32 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
         def workDir = new File("${project.buildDir}/reference-work");
         workDir.mkdirs();
 
-        // copy everything but index.xml
-        project.copy {
-            into(workDir)
-            from(sourceDir) { exclude '**/index.xml' }
+        def expandables
+
+        /*
+         * Normally, only index.xml has placeholders expanded. Projects can add other
+         * file patterns (comma-delimited) to a property 'expandPlaceholders'.
+         */
+        if (project.hasProperty('expandPlaceholders')) {
+            expandables = ('**/index.xml,' + "${project.expandPlaceholders}").split(',')
+        }
+        else {
+            expandables = '**/index.xml'
         }
 
-        // copy index.xml and expand ${...} variables along the way
+        logger.debug('Files that will have placeholders expanded:' + expandables)
+
+        // copy everything but those requiring expansion
+        project.copy {
+            into(workDir)
+            from(sourceDir) { exclude expandables }
+        }
+
+        // copy and expand ${...} variables along the way
         // e.g.: ${version} needs to be replaced in the header
         project.copy {
             into(workDir)
-            from(sourceDir) { include '**/index.xml' }
+            from(sourceDir) { include expandables  }
             expand(version: "${project.version}")
         }
 
