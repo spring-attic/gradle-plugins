@@ -179,6 +179,10 @@ table tr:nth-child(2n) {
 }
 
 td p {
+	margin: 0 0 15px 0;
+}
+
+div.table-contents td p {
 	margin: 0;
 }
 
@@ -197,7 +201,7 @@ div.calloutlist > table > tbody > tr > td:first-child {
 	width: 30px !important;
 }
 
-div.note,div.tip,div.warning {
+div.important,div.note,div.tip,div.warning {
 	margin-left: 40px !important;
 	margin-right: 20px !important;
 	margin-top: 10px;
