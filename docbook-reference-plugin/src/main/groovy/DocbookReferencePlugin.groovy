@@ -148,7 +148,8 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
     }
 
     protected void postTransform(File outputFile) {
-        copyImagesAndCss(project, xdir)
+        copyImages(project, xdir)
+        copyCss(project, xdir)
     }
 
     /**
@@ -271,26 +272,40 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
         return manager;
     }
 
-    private void copyImagesAndCss(def project, def dir) {
+    protected String copyImages(def project, def dir) {
+        def targetPath = "${project.buildDir}/reference/${dir}/images"
+
         // copy plugin provided resources first
         project.copy {
-            into "${project.buildDir}/reference/${dir}/images"
+            into targetPath
             from "${project.buildDir}/docbook-resources/images"
         }
+
+        // allow for project provided resources to override
         project.copy {
-            into "${project.buildDir}/reference/${dir}/css"
+            into targetPath
+            from "${sourceDir}/images"
+        }
+
+        return targetPath;
+    }
+
+    protected String copyCss(def project, def dir) {
+        def targetPath = "${project.buildDir}/reference/${dir}/css"
+
+        // copy plugin provided resources first
+        project.copy {
+            into targetPath
             from "${project.buildDir}/docbook-resources/css"
         }
 
         // allow for project provided resources to override
         project.copy {
-            into "${project.buildDir}/reference/${dir}/images"
-            from "${sourceDir}/images"
-        }
-        project.copy {
-            into "${project.buildDir}/reference/${dir}/css"
+            into targetPath
             from "${sourceDir}/css"
         }
+
+        return targetPath;
     }
 }
 
@@ -350,8 +365,10 @@ class PdfDocbookReferenceTask extends AbstractDocbookReferenceTask {
      */
     @Override
     protected void postTransform(File foFile) {
+        String imagesPath = copyImages(project, xdir)
+
         FopFactory fopFactory = FopFactory.newInstance();
-        fopFactory.setBaseURL(project.file("${project.buildDir}/docbook-resources").toURI().toURL().toExternalForm());
+        fopFactory.setBaseURL(project.file("${project.buildDir}/reference/pdf").toURI().toURL().toExternalForm());
 
         OutputStream out = null;
         final File pdfFile = getPdfOutputFile(foFile);
@@ -390,6 +407,10 @@ class PdfDocbookReferenceTask extends AbstractDocbookReferenceTask {
 
         if (!foFile.delete()) {
             logger.warn("Failed to delete 'fo' file " + foFile);
+        }
+
+        if (!project.delete(imagesPath)) {
+          logger.warn("Failed to delete 'images' path " + imagesPath);
         }
     }
 
