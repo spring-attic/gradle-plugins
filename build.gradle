@@ -75,13 +75,13 @@ project(':docbook-reference-plugin') {
     }
 
 
-    task docbookResourcesZip(type: Zip) {
+    task docbookResourcesZip(type: Zip, dependsOn: copyDocbookResources) {
         from copyDocbookResources.outputs.files
         destinationDir = new File(project.sourceSets.main.output.classesDir, "META-INF")
         archiveName = 'docbook-resources.zip'
     }
 
-    assemble.dependsOn docbookResourcesZip
+    jar.dependsOn docbookResourcesZip
 }
 
 

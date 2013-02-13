@@ -272,10 +272,7 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
     }
 
     private void copyImagesAndCss(def project, def dir) {
-        project.copy {
-            into "${project.buildDir}/reference/${dir}/images"
-            from "${sourceDir}/images"
-        }
+        // copy plugin provided resources first
         project.copy {
             into "${project.buildDir}/reference/${dir}/images"
             from "${project.buildDir}/docbook-resources/images"
@@ -283,6 +280,16 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
         project.copy {
             into "${project.buildDir}/reference/${dir}/css"
             from "${project.buildDir}/docbook-resources/css"
+        }
+
+        // allow for project provided resources to override
+        project.copy {
+            into "${project.buildDir}/reference/${dir}/images"
+            from "${sourceDir}/images"
+        }
+        project.copy {
+            into "${project.buildDir}/reference/${dir}/css"
+            from "${sourceDir}/css"
         }
     }
 }
