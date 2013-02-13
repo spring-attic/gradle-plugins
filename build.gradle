@@ -9,6 +9,7 @@ buildscript {
 
 allprojects {
     apply plugin: 'artifactory'
+    apply plugin: 'idea'
 }
 
 subprojects {
