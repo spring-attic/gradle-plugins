@@ -1,6 +1,5 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.logging.LogLevel
 
 /**
@@ -24,7 +23,7 @@ public class BundlorPlugin implements Plugin<Project> {
         }
 
         project.tasks.add("bundlor") {
-			
+
             ext {
                 dependsOn project.compileJava
                 group = 'Build'
@@ -37,12 +36,13 @@ public class BundlorPlugin implements Plugin<Project> {
                 bundleVendor = 'SpringSource'
                 bundleSymbolicName = null
                 bundleManifestVersion = '2'
+                importPackage = []
                 importTemplate = []
                 manifestTemplate = null
 
                 outputDir = new File("${project.buildDir}/bundlor")
             }
-			
+
             def manifest = new File("${outputDir}/META-INF/MANIFEST.MF")
 
             // inform gradle what directory this task writes so that
@@ -112,6 +112,18 @@ public class BundlorPlugin implements Plugin<Project> {
                             Bundle-ManifestVersion: ${bundleManifestVersion}
                             Bundle-SymbolicName: ${bundleSymbolicName}
                         """.stripIndent()
+                        if (!importPackage.isEmpty()) {
+                            manifestTemplate += "Import-Package: "
+                            importPackage.each { entry ->
+                                manifestTemplate += "\n " + entry
+                                if (entry != importPackage.last()) {
+                                    manifestTemplate += ','
+                                }
+                                else {
+                                    manifestTemplate += '\n'
+                                }
+                            }
+                        }
                         if (!importTemplate.isEmpty()) {
                             manifestTemplate += "Import-Template: "
                             importTemplate.each { entry ->
