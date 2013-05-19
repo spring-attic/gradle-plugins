@@ -22,7 +22,7 @@ public class BundlorPlugin implements Plugin<Project> {
                     'com.springsource.bundlor:com.springsource.bundlor.blint:1.0.0.RELEASE'
         }
 
-        project.tasks.add("bundlor") {
+        project.tasks.create("bundlor") {
 
             ext {
                 dependsOn project.compileJava
