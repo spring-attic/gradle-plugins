@@ -53,7 +53,7 @@ class PropDepsPlugin implements Plugin<Project> {
 	}
 
 	private Configuration addConfiguration(Project project, String name) {
-		Configuration configuration = project.configurations.add(name)
+		Configuration configuration = project.configurations.create(name)
 		configuration.visible = false
 		configuration.extendsFrom(project.configurations.getByName("compile"))
 		return configuration
