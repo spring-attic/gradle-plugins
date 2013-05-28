@@ -217,6 +217,26 @@ dl,dt {
 	margin-bottom: 0;
 }
 
+div.toc span.part {
+	font-size: 32px;
+	font-weight: bold;
+	margin: 30px 0 10px 0;
+	display: block;
+}
+
+div.toc span.chapter {
+	font-size: 24px;
+	font-weight: bold;
+	margin: 20px 0 10px 0;
+	display: block;
+}
+
+div.toc > dl > dd > dl > dd > dl > dt {
+	font-weight: bold;
+	font-size: 20px;
+	margin: 10px 0 0 0;
+}
+
 tbody.footnotes * {
 	border: none !important;
 }
