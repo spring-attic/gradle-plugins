@@ -55,7 +55,7 @@ class DocbookReferencePlugin implements Plugin<Project> {
             ext.sourceDir = null // e.g. new File('src/reference')
             ext.outputDir = new File(project.buildDir, "reference")
             ext.pdfFilename = "${project.rootProject.name}-reference.pdf"
-
+            ext.sourceFileName = 'index.xml'
             outputs.dir outputDir
         }
 
@@ -67,6 +67,10 @@ class DocbookReferencePlugin implements Plugin<Project> {
             if (multi.outputDir == null) multi.outputDir = reference.outputDir
             if (single.outputDir == null) single.outputDir = reference.outputDir
             if (pdf.outputDir == null) pdf.outputDir = reference.outputDir
+
+            if (multi.sourceFileName == null) multi.sourceFileName = reference.sourceFileName
+            if (single.sourceFileName == null) single.sourceFileName = reference.sourceFileName
+            if (pdf.sourceFileName == null) pdf.sourceFileName = reference.sourceFileName
         }
 
     }
@@ -78,7 +82,7 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
     File sourceDir // e.g. 'src/reference'
 
     @Input
-    String sourceFileName = 'index.xml';
+    String sourceFileName;
 
     String stylesheet;
 
@@ -160,17 +164,14 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
         def workDir = new File("${project.buildDir}/reference-work");
         workDir.mkdirs();
 
-        def expandables
+        def expandables = '**/index.xml'
 
         /*
          * Normally, only index.xml has placeholders expanded. Projects can add other
          * file patterns (comma-delimited) to a property 'expandPlaceholders'.
          */
         if (project.hasProperty('expandPlaceholders')) {
-            expandables = ('**/index.xml,' + "${project.expandPlaceholders}").split(',')
-        }
-        else {
-            expandables = '**/index.xml'
+            expandables = project.expandPlaceholders.split(',')
         }
 
         logger.debug('Files that will have placeholders expanded:' + expandables)
