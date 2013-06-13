@@ -41,7 +41,7 @@ dependencies {
 ```
 
 No additional tasks are installed, however, existing `eclipse` `idea` and
-`install` tasks are enhanced to support the new configuratins:
+`install` tasks are enhanced to support the new configurations:
 
 ```
 $ gradle install
