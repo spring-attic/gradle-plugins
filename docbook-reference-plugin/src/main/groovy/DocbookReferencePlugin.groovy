@@ -34,7 +34,6 @@ import org.xml.sax.XMLReader
 
 import com.icl.saxon.TransformerFactoryImpl
 
-
 class DocbookReferencePlugin implements Plugin<Project> {
 
 	def void apply(Project project) {
@@ -57,6 +56,7 @@ class DocbookReferencePlugin implements Plugin<Project> {
 			ext.pdfFilename = "${project.rootProject.name}-reference.pdf"
 			ext.sourceFileName = 'index.xml'
 			ext.expandPlaceholders = '**/index.xml'
+			ext.fopUserConfig = null
 			outputs.dir outputDir
 		}
 
@@ -362,6 +362,9 @@ class PdfDocbookReferenceTask extends AbstractDocbookReferenceTask {
 		String imagesPath = copyImages(project, xdir)
 
 		FopFactory fopFactory = FopFactory.newInstance();
+		if (project.reference.fopUserConfig != null) {
+			fopFactory.setUserConfig(project.reference.fopUserConfig)
+		}
 		fopFactory.setBaseURL(project.file("${project.buildDir}/reference/pdf").toURI().toURL().toExternalForm());
 
 		OutputStream out = null;
