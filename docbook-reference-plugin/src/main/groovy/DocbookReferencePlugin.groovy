@@ -34,7 +34,6 @@ import org.xml.sax.XMLReader
 
 import com.icl.saxon.TransformerFactoryImpl
 
-
 class DocbookReferencePlugin implements Plugin<Project> {
 
     def void apply(Project project) {
@@ -56,6 +55,7 @@ class DocbookReferencePlugin implements Plugin<Project> {
             ext.outputDir = new File(project.buildDir, "reference")
             ext.pdfFilename = "${project.rootProject.name}-reference.pdf"
             ext.sourceFileName = 'index.xml'
+            ext.fopUserConfig = null
             outputs.dir outputDir
         }
 
@@ -368,7 +368,7 @@ class PdfDocbookReferenceTask extends AbstractDocbookReferenceTask {
     protected void postTransform(File foFile) {
         String imagesPath = copyImages(project, xdir)
 
-        FopFactory fopFactory = FopFactory.newInstance();
+        FopFactory fopFactory = createFopFactory()
         fopFactory.setBaseURL(project.file("${project.buildDir}/reference/pdf").toURI().toURL().toExternalForm());
 
         OutputStream out = null;
@@ -413,6 +413,17 @@ class PdfDocbookReferenceTask extends AbstractDocbookReferenceTask {
         if (!project.delete(imagesPath)) {
           logger.warn("Failed to delete 'images' path " + imagesPath);
         }
+    }
+
+    private FopFactory createFopFactory() {
+        configureFopFactory(FopFactory.newInstance());
+    }
+
+    FopFactory configureFopFactory(FopFactory fopFactory) {
+        if (project.reference.fopUserConfig != null) {
+            fopFactory.setUserConfig(project.reference.fopUserConfig)
+        }
+        fopFactory
     }
 
     private File getPdfOutputFile(File foFile) {
