@@ -3,19 +3,19 @@ buildscript {
         maven { url 'https://repo.springsource.org/plugins-release' }
     }
     dependencies {
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.1.0'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.2.2'
     }
 }
 
 allprojects {
-    apply plugin: 'artifactory'
     apply plugin: 'idea'
+    apply plugin: 'eclipse'
 }
 
 subprojects {
     apply plugin: 'groovy'
     apply plugin: 'maven'
-    apply plugin: 'eclipse'
+    apply plugin: 'artifactory'
 
     group = 'org.springframework.build.gradle'
 
