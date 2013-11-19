@@ -217,14 +217,14 @@ dl,dt {
 	margin-bottom: 0;
 }
 
-div.toc span.part {
+div.toc > dl > dt {
 	font-size: 32px;
 	font-weight: bold;
 	margin: 30px 0 10px 0;
 	display: block;
 }
 
-div.toc span.chapter {
+div.toc > dl > dd > dl > dt {
 	font-size: 24px;
 	font-weight: bold;
 	margin: 20px 0 10px 0;
