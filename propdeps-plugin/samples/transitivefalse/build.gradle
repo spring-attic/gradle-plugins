@@ -1,0 +1,28 @@
+buildscript {
+	repositories {
+		maven { url "http://repo.springsource.org/plugins-release" }
+		mavenLocal()
+	}
+	dependencies {
+		classpath("org.springframework.build.gradle:propdeps-plugin:0.0.5-SNAPSHOT")
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+apply plugin: "propdeps"
+apply plugin: "java"
+
+configurations.compile.transitive = false
+configurations.provided.transitive = false
+configurations.optional.transitive = false
+
+dependencies {
+	provided("org.springframework:spring-core:3.2.5.RELEASE")
+	optional("org.springframework:spring-context:3.2.5.RELEASE")
+}
+
+print(sourceSets.main.compileClasspath.asPath.replaceAll(";", "\n"))
+
