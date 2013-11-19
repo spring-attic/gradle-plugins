@@ -20,8 +20,14 @@ configure(rootproject) {
     reference {
         sourceDir = file('src/reference/docbook')
         pdfFilename = 'spring-framework-reference.pdf'
-        // optionally configure fop for pdf generation
-        // fopUserConfig = file('src/reference/fop/fop-userconfig.xml')
+
+        // optionally 
+        
+        // configure fop for pdf generation
+        fopUserConfig = file('src/reference/fop/fop-userconfig.xml')
+        
+        // Configure which files have ${} expanded
+        expandPlaceholders = '**/index.xml, **/other.xml'
     }
 
     task docsZip(type: Zip) {
