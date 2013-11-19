@@ -56,6 +56,7 @@ class DocbookReferencePlugin implements Plugin<Project> {
             ext.outputDir = new File(project.buildDir, "reference")
             ext.pdfFilename = "${project.rootProject.name}-reference.pdf"
             ext.sourceFileName = 'index.xml'
+            ext.expandPlaceholders = '**/index.xml'
             outputs.dir outputDir
         }
 
@@ -78,6 +79,7 @@ class DocbookReferencePlugin implements Plugin<Project> {
 }
 
 abstract class AbstractDocbookReferenceTask extends DefaultTask {
+
     @InputDirectory
     File sourceDir // e.g. 'src/reference'
 
@@ -164,16 +166,7 @@ abstract class AbstractDocbookReferenceTask extends DefaultTask {
         def workDir = new File("${project.buildDir}/reference-work");
         workDir.mkdirs();
 
-        def expandables = '**/index.xml'
-
-        /*
-         * Normally, only index.xml has placeholders expanded. Projects can add other
-         * file patterns (comma-delimited) to a property 'expandPlaceholders'.
-         */
-        if (project.hasProperty('expandPlaceholders')) {
-            expandables = project.expandPlaceholders.split(',')
-        }
-
+        def expandables = project.reference.expandPlaceholders.split(',')
         logger.debug('Files that will have placeholders expanded:' + expandables)
 
         // copy everything but those requiring expansion
