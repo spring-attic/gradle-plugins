@@ -20,6 +20,8 @@ configure(rootproject) {
     reference {
         sourceDir = file('src/reference/docbook')
         pdfFilename = 'spring-framework-reference.pdf'
+        // optionally configure fop for pdf generation
+        // fopUserConfig = file('src/reference/fop/fop-userconfig.xml')
     }
 
     task docsZip(type: Zip) {
