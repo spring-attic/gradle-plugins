@@ -22,6 +22,9 @@ import org.gradle.api.artifacts.maven.MavenPom
 import org.gradle.api.artifacts.maven.PomFilterContainer
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.*
+import org.gradle.configuration.project.ProjectConfigurationActionContainer
+
+import javax.inject.Inject
 
 /**
  * Plugin to allow optional and provided dependency configurations to work with the
@@ -30,6 +33,14 @@ import org.gradle.api.tasks.*
  * @author Phillip Webb
  */
 class PropDepsMavenPlugin implements Plugin<Project> {
+
+	public static final String UPLOAD_ARCHIVES_TASK_NAME = 'uploadArchives'
+	private final ProjectConfigurationActionContainer configurationActionContainer;
+
+	@Inject
+	public PropDepsMavenPlugin(ProjectConfigurationActionContainer configurationActionContainer) {
+		this.configurationActionContainer = configurationActionContainer;
+	}
 
 	public void apply(Project project) {
 		project.plugins.apply(PropDepsPlugin)
@@ -45,6 +56,15 @@ class PropDepsMavenPlugin implements Plugin<Project> {
 
 		// Add a hook to replace the optional scope
 		project.tasks.withType(Upload).each{ applyToUploadTask(project, it) }
+
+		// Add a hook to replace the optional scope for uploadArchives task
+		configurationActionContainer.add { projectAfterConfiguration ->
+			Upload uploadArchives = projectAfterConfiguration.getTasks().withType(Upload.class).findByName(UPLOAD_ARCHIVES_TASK_NAME)
+
+			if (uploadArchives != null) {
+				applyToUploadTask(projectAfterConfiguration, uploadArchives)
+			}
+		}
 	}
 
 	private void applyToUploadTask(Project project, Upload upload) {
