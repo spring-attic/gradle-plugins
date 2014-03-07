@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,28 @@ package org.springframework.build.gradle.propdep
 
 import org.gradle.api.*
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.file.FileCollection
-import org.gradle.api.internal.file.UnionFileCollection
+import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.api.tasks.*
 import org.gradle.api.tasks.javadoc.Javadoc
 
 /**
  * Plugin to allow 'optional' and 'provided' dependency configurations
  *
+ * As stated in the maven documentation, provided scope "is only available on the compilation and test classpath,
+ * and is not transitive".
+ *
+ * This plugin creates two new configurations, and each one:
+ * <ul>
+ * <li>is a parent of the compile configuration</li>
+ * <li>is not visible, not transitive</li>
+ * <li>all dependencies are excluded from the default configuration</li>
+ * </ul>
+ *
  * @author Phillip Webb
+ * @author Brian Clozel
+ *
+ * @see <a href="http://www.gradle.org/docs/current/userguide/java_plugin.html#N121CF">Maven documentation</a>
+ * @see <a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Dependency_Scope">Gradle configurations</a>
  * @see PropDepsEclipsePlugin
  * @see PropDepsIdeaPlugin
  * @see PropDepsMavenPlugin
@@ -38,31 +49,26 @@ class PropDepsPlugin implements Plugin<Project> {
 	public void apply(Project project) {
 		project.plugins.apply(JavaPlugin)
 
-		def provided = addConfiguration(project, "provided")
-		def optional = addConfiguration(project, "optional")
-
-		JavaPluginConvention javaConvention = project.convention.plugins["java"]
-		SourceSetContainer sourceSets = javaConvention.sourceSets
-		addToSourceSet(sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME), provided, optional)
-		addToSourceSet(sourceSets.getByName(SourceSet.TEST_SOURCE_SET_NAME), provided, optional)
+		Configuration provided = addConfiguration(project.configurations, "provided")
+		Configuration optional = addConfiguration(project.configurations, "optional")
 
 		Javadoc javadoc = project.tasks.getByName(JavaPlugin.JAVADOC_TASK_NAME)
-		javadoc.classpath = new UnionFileCollection(javadoc.classpath, provided, optional)
-
-		project.configurations.getByName("testRuntime").extendsFrom(provided, optional)
+		javadoc.classpath = javadoc.classpath.plus(provided).plus(optional)
 	}
 
-	private Configuration addConfiguration(Project project, String name) {
-		Configuration configuration = project.configurations.create(name)
+	private Configuration addConfiguration(ConfigurationContainer configurations, String name) {
+		Configuration compile = configurations.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME)
+		Configuration configuration = configurations.create(name)
+
+		compile.extendsFrom(configuration)
 		configuration.visible = false
-		configuration.extendsFrom(project.configurations.getByName("compile"))
+		configuration.transitive = false
+
+		configuration.allDependencies.all {
+			dep -> configurations.default.exclude(group: dep.group, module: dep.name)
+		}
+
 		return configuration
 	}
 
-	private addToSourceSet(SourceSet sourceSet, FileCollection... configurations) {
-		sourceSet.compileClasspath = new UnionFileCollection(
-			[sourceSet.compileClasspath] + configurations)
-		sourceSet.runtimeClasspath = new UnionFileCollection(
-			[sourceSet.runtimeClasspath] + configurations)
-	}
 }
