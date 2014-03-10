@@ -49,4 +49,4 @@ $ gradle eclipse
 $ gradle idea
 ```
 
-[1]: https://github.com/SpringSource/gradle-plugins/tags
+[1]: https://github.com/spring-projects/gradle-plugins/tags
