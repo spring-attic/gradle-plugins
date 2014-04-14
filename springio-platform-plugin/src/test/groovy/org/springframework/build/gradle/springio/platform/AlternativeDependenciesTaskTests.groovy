@@ -40,4 +40,16 @@ class AlternativeDependenciesTaskTests extends Specification {
 		then:
 			thrown(IllegalStateException)
 	}
+
+	def "default ignores testCompile"() {
+		setup:
+			parent.dependencies {
+				testCompile 'cglib:cglib:3.3.1'
+			}
+			task.alternaives = ['cglib:cglib' : 'Please use some alternative']
+		when:
+			task.check()
+		then: 'No error since many testing frameworks (i.e. mocking frameworks) require cglib'
+			noExceptionThrown()
+	}
 }

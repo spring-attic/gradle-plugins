@@ -1,7 +1,9 @@
 package org.springframework.build.gradle.springio.platform
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
@@ -13,7 +15,10 @@ import org.gradle.api.tasks.TaskAction
 class AlternativeDependenciesTask extends DefaultTask {
 	@OutputFile
 	File reportFile = project.file("$project.buildDir/springio/alternative-dependencies.log")
+	@Input
 	Map<String,String> alternatives
+	@Input
+	Collection<Configuration> configurations
 
 	@TaskAction
 	void check() {
@@ -23,9 +28,12 @@ class AlternativeDependenciesTask extends DefaultTask {
 			alternatives = new Properties()
 			alternatives.load(stream)
 		}
+		if(!configurations) {
+			configurations = project.configurations.findAll { !it.name.toLowerCase().contains('test') }
+		}
 
 		def problemsByConfiguration = [:]
-		project.configurations.each { configuration ->
+		configurations.each { configuration ->
 			def problems = []
 			configuration.dependencies.each { dependency ->
 				if (dependency instanceof ExternalModuleDependency) {
