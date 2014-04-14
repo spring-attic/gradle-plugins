@@ -1,0 +1,126 @@
+= SpringioPlatformPlugin
+Rob Winch
+:toc:
+:toc-placement: preamble
+:sectanchors:
+:icons: font
+:source-highlighter: prettify
+:idseparator: -
+:idprefix:
+:doctype: book
+
+== Overview
+Provides additional checks to ensure springio platform compatibility
+
+== Quick Start
+
+See https://github.com/SpringSource/gradle-plugins/tags[tags] to determine the
+latest available version. Then configure the plugin in your project as
+follows:
+
+[source,groovy]
+----
+buildscript {
+    repositories {
+        maven { url 'http://repo.springsource.org/plugins-snapshot' }
+    }
+    dependencies {
+        classpath 'org.springframework.build.gradle:springio-platform-plugin:0.0.1.BUILD-SNAPSHOT'
+    }
+}
+
+// ...
+
+configure(allprojects) {
+    apply plugin: 'springio-platform'
+}
+----
+
+Now you can run the following:
+
+[source,bash]
+----
+$ gradlew clean springioCheck -PJDK8_HOME=<jdk8-home> -PJDK7_HOME=<jdk7-home>
+----
+
+This will:
+
+* Assist with running tests against your compiled code using JDK7 and JDK8 and the SpringIO dependency versions. For more information refer to <<additional-tests>>
+* Ensure that all dependency exclusions use both the group and the module. For more information refer to <<incompleteexcludestask>>
+* Verify that certain dependencies are not used and suggest alternatives. For more information refer to <<alternativedependenciestask>>
+
+If you would like springioCheck to be part of your standard build, then you can make the check task depend on springioCheck as shown below:
+
+[source,groovy]
+----
+configure(allprojects) {
+    apply plugin: 'springio-platform'
+
+    // ...
+
+    check.dependsOn springioCheck
+}
+----
+
+== Additional Tests
+
+One of the goals of the SpringIO platform is to ensure modules work with JDK7 and JDK8 and that they run with specific versions of dependencies. Applying the plugin will create tests that:
+
+* Nothing changes for how your code is actually compiled
+* Ensure that the Spring IO versions of dependencies are used at runtime
+* Tests are ran against the specified JDKs
+
+For example, the following will compile the project with the declared dependency versions and JDK. It will then run all the tests against JDK7 and JDK8 with the Spring IO dependency versions.
+
+[source,bash]
+----
+$ gradlew springioCheck -PJDK8_HOME=<jdk8-home> -PJDK7_HOME=<jdk7-home>
+----
+
+Where `<jdk8-home>` is the absolute path to the JDK8 Home and `<jdk7-home>` is the absolute path to the JDK7 Home. For example, an real example might look like:
+
+[source,bash]
+----
+gradlew springioCheck -PJDK8_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home -PJDK7_HOME=/Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home
+----
+
+NOTE: You can also place JDK8_HOME and JDK7_HOME in your gradle.properties
+
+== IncompleteExcludesTask
+
+This task ensures that any dependency exclusions that are done use both the group and the module because otherwise the dependency will not be excluded in the generated pom.xml file. For example the following is not allowed because it only excludes the module:
+
+[source,groovy]
+----
+dependencies {
+	compile('org.springframework:spring-core:3.2.0.RELEASE') {
+		exclude module: 'commons-logging'
+	}
+}
+----
+
+the following is not allowed because it only excludes the group:
+
+[source,groovy]
+----
+dependencies {
+	compile('org.springframework:spring-core:3.2.0.RELEASE') {
+		exclude group: 'commons-logging'
+	}
+}
+----
+
+the following is allowed because it only excludes both the group and the module:
+
+[source,groovy]
+----
+dependencies {
+	compile('org.springframework:spring-core:3.2.0.RELEASE') {
+		exclude group: 'commons-logging', module: 'commons-logging'
+	}
+}
+----
+
+== AlternativeDependenciesTask
+
+This task will ensure certain dependencies are not used and suggest alternatives. For example, intead of using asm:asm it is preferred to use spring-core's repackages asm dependencies.
