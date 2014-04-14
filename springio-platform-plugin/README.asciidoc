@@ -22,7 +22,7 @@ follows:
 ----
 buildscript {
     repositories {
-        maven { url 'http://repo.springsource.org/plugins-snapshot' }
+        maven { url 'https://repo.spring.io/plugins-snapshot' }
     }
     dependencies {
         classpath 'org.springframework.build.gradle:springio-platform-plugin:0.0.1.BUILD-SNAPSHOT'
