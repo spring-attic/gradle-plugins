@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        maven { url 'https://repo.springsource.org/plugins-release' }
+        maven { url 'https://repo.spring.io/plugins-release' }
     }
     dependencies {
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.2.2'
@@ -20,7 +20,7 @@ subprojects {
     group = 'org.springframework.build.gradle'
 
     repositories {
-        maven { url 'https://repo.springsource.org/libs-release' }
+        maven { url 'https://repo.spring.io/libs-release' }
     }
 
     dependencies {
@@ -105,7 +105,7 @@ gradle.taskGraph.whenReady {taskGraph ->
 }
 
 artifactory {
-    contextUrl = 'https://repo.springsource.org'
+    contextUrl = 'https://repo.spring.io'
     publish {
         repository {
             repoKey = 'plugins-snapshot-local'
@@ -128,5 +128,5 @@ artifactory {
 
 task wrapper(type: Wrapper) {
     description = 'Generates gradlew[.bat] scripts'
-    gradleVersion = '1.8'
+    gradleVersion = '1.11'
 }

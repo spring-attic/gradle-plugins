@@ -9,10 +9,10 @@ follows:
 ```groovy
 buildscript {
     repositories {
-        maven { url 'http://repo.springsource.org/plugins-release' }
+        maven { url 'http://repo.spring.io/plugins-release' }
     }
     dependencies {
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.1'
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.5'
     }
 }
 
@@ -49,4 +49,4 @@ $ gradle eclipse
 $ gradle idea
 ```
 
-[1]: https://github.com/SpringSource/gradle-plugins/tags
+[1]: https://github.com/spring-projects/gradle-plugins/tags

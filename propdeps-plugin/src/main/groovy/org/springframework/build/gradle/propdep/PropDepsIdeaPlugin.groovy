@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 package org.springframework.build.gradle.propdep
 
 import org.gradle.api.*
-import org.gradle.api.plugins.scala.ScalaBasePlugin;
-import org.gradle.api.tasks.*
 import org.gradle.plugins.ide.idea.IdeaPlugin
 
 /**
@@ -26,6 +24,9 @@ import org.gradle.plugins.ide.idea.IdeaPlugin
  * standard gradle 'idea' plugin
  *
  * @author Phillip Webb
+ * @author Brian Clozel
+ * @link http://youtrack.jetbrains.com/issue/IDEA-107046
+ * @link http://youtrack.jetbrains.com/issue/IDEA-117668
  */
 class PropDepsIdeaPlugin implements Plugin<Project> {
 
@@ -33,20 +34,10 @@ class PropDepsIdeaPlugin implements Plugin<Project> {
 		project.plugins.apply(PropDepsPlugin)
 		project.plugins.apply(IdeaPlugin)
 		project.idea.module {
+			// IDEA internally deals with 4 scopes : COMPILE, TEST, PROVIDED, RUNTIME
+			// but only PROVIDED seems to be picked up
 			scopes.PROVIDED.plus += project.configurations.provided
-			// Add a new temporary scope to ensure option dependencies are not exported
-			scopes.put("OPTIONAL", [plus: [project.configurations.optional], minus: []])
-		}
-		// Remove the temporary OPTIONAL scope
-		project.idea.module.iml {
-			whenMerged { module ->
-				module.dependencies.each {
-					if(it.scope == "OPTIONAL") {
-						it.scope = "COMPILE"
-					}
-				}
-			}
+			scopes.PROVIDED.plus += project.configurations.optional
 		}
 	}
-
 }
