@@ -4,6 +4,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
@@ -13,11 +14,16 @@ import org.gradle.api.tasks.TaskAction
  * @author Andy Wilkinson
  */
 class AlternativeDependenciesTask extends DefaultTask {
+
 	@OutputFile
 	File reportFile = project.file("$project.buildDir/springio/alternative-dependencies.log")
+
 	@Input
+	@Optional
 	Map<String,String> alternatives
+
 	@Input
+	@Optional
 	Collection<Configuration> configurations
 
 	@TaskAction
