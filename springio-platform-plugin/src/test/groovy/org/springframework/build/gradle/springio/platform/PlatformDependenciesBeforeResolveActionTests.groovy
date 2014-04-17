@@ -4,66 +4,57 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.DependencyResolveDetails
+import org.gradle.api.artifacts.ResolvableDependencies;
 import org.gradle.api.internal.artifacts.DefaultModuleVersionSelector
 import org.gradle.api.internal.artifacts.ivyservice.DefaultDependencyResolveDetails
 import org.gradle.testfixtures.ProjectBuilder
+
 import spock.lang.Specification
 
 /**
  *
  * @author Rob Winch
+ * @author Andy Wilkinson
  */
-class ConfigureResolutionStrategyTaskTests extends Specification {
+class PlatformDependenciesBeforeResolveActionTests extends Specification {
 	Project parent
 	Project child
 	Configuration config
-	ConfigureResolutionStrategyTask task
+	PlatformDependenciesBeforeResolveAction action
 
 	def setup() {
 		parent = ProjectBuilder.builder().withName("parent").build()
+		parent.extensions.create("springioPlatform", SpringioPlatformExtension)
 		parent.group = 'thisprojectgroup'
 		parent.version = 'nochange'
 
 		config = parent.configurations.create('configuration')
-		task = parent.tasks.create(name: SpringioPlatformPlugin.CONFIG_RESOLUTION_STRATEGY_TASK_NAME, type: ConfigureResolutionStrategyTask) {
-			configuration = config
-		}
+		action = new PlatformDependenciesBeforeResolveAction(project:parent, configuration: config)
 
 		child = ProjectBuilder.builder().withName('child').withParent(parent).build()
 		child.group = parent.group
 		child.version = parent.version
 	}
 
-	def "configure adds Action as ResolutionStrategy Rule"() {
+	def "execute adds Action as ResolutionStrategy Rule"() {
 		setup:
-			task.action = Mock(Action)
+			def resolutionAction = Mock(Action)
+			parent.springioPlatform {
+				dependencyResolutionAction = resolutionAction
+			}
 			DependencyResolveDetails details = details('org.springframework:spring-core:3.2.0.RELEASE')
 		when:
-			task.configure()
+		    action.execute(Mock(ResolvableDependencies))
 			config.resolutionStrategy.dependencyResolveRule.execute(details)
 		then:
-			1 * task.action.execute(details)
+			1 * resolutionAction.execute(details)
 	}
 
-	def "configure defaults Action"() {
-		setup:
-			DependencyResolveDetails details = details('org.springframework:spring-core:3.2.0.RELEASE')
-		when:
-			task.configure()
-		then: 'Is of correct type'
-			task.action instanceof ConfigureResolutionStrategyTask.MappingDependencyResolveDetailsAction
-		and: 'Sanity check of the Mapping (detailed checks are done with testTask resource)'
-			task.action.depToSelector['org.springframework:']
-		and: 'Ignore these projects'
-			task.action.ignoredGroupAndNames == ['thisprojectgroup:parent','thisprojectgroup:child'] as Set
-	}
-
-	def "default Action ignores these projects"() {
+	def "default dependency resolution action ignores these projects"() {
 		setup:
 			DependencyResolveDetails details = details('thisprojectgroup:child:nochange')
-			task.action = defaultTestAction()
 		when:
-			task.configure()
+			action.execute(Mock(ResolvableDependencies))
 			config.resolutionStrategy.dependencyResolveRule.execute(details)
 		then:
 			details.target.version == 'nochange'
@@ -71,12 +62,12 @@ class ConfigureResolutionStrategyTaskTests extends Specification {
 			details.target.group == 'thisprojectgroup'
 	}
 
-	def "default Action supports group only"() {
+	def "default dependency resolution action supports group only"() {
 		setup:
 			DependencyResolveDetails details = details('grouponly:notdefined:changeme')
-			task.action = defaultTestAction()
+			configureDefaultDependencyResolutionAction(parent)
 		when:
-			task.configure()
+			action.execute(Mock(ResolvableDependencies))
 			config.resolutionStrategy.dependencyResolveRule.execute(details)
 		then:
 			details.target.version == 'grouponlyversion'
@@ -84,12 +75,12 @@ class ConfigureResolutionStrategyTaskTests extends Specification {
 			details.target.group == 'grouponly'
 	}
 
-	def "default Action supports name only"() {
+	def "default dependency resolution action supports name only"() {
 		setup:
 			DependencyResolveDetails details = details('notdefined:nameonly:changeme')
-			task.action = defaultTestAction()
+			configureDefaultDependencyResolutionAction(parent)
 		when:
-			task.configure()
+			action.execute(Mock(ResolvableDependencies))
 			config.resolutionStrategy.dependencyResolveRule.execute(details)
 		then:
 			details.target.version == 'nameonlyversion'
@@ -97,12 +88,12 @@ class ConfigureResolutionStrategyTaskTests extends Specification {
 			details.target.group == 'notdefined'
 	}
 
-	def "default Action supports name and group"() {
+	def "default dependency resolution action supports name and group"() {
 		setup:
 			DependencyResolveDetails details = details('standardgroup:standardname:changeme')
-			task.action = defaultTestAction()
+			configureDefaultDependencyResolutionAction(parent)
 		when:
-			task.configure()
+			action.execute(Mock(ResolvableDependencies))
 			config.resolutionStrategy.dependencyResolveRule.execute(details)
 		then:
 			details.target.version == 'standardversion'
@@ -110,12 +101,12 @@ class ConfigureResolutionStrategyTaskTests extends Specification {
 			details.target.group == 'standardgroup'
 	}
 
-	def "default Action prioritizes both group and name highest"() {
+	def "default dependency resolution action prioritizes both group and name highest"() {
 		setup:
 			DependencyResolveDetails details = details('prioritygroup:priorityname:changeme')
-			task.action = defaultTestAction()
+			configureDefaultDependencyResolutionAction(parent)
 		when:
-			task.configure()
+			action.execute(Mock(ResolvableDependencies))
 			config.resolutionStrategy.dependencyResolveRule.execute(details)
 		then:
 			details.target.version == 'prioritygroupandnameversion'
@@ -123,12 +114,12 @@ class ConfigureResolutionStrategyTaskTests extends Specification {
 			details.target.group == 'prioritygroup'
 	}
 
-	def "default Action prioritizes group only second highest"() {
+	def "default dependency resolution action prioritizes group only second highest"() {
 		setup:
 			DependencyResolveDetails details = details('priority2group:notfound:changeme')
-			task.action = defaultTestAction()
+			configureDefaultDependencyResolutionAction(parent)
 		when:
-			task.configure()
+			action.execute(Mock(ResolvableDependencies))
 			config.resolutionStrategy.dependencyResolveRule.execute(details)
 		then:
 			details.target.version == 'priority2groupversion'
@@ -136,34 +127,34 @@ class ConfigureResolutionStrategyTaskTests extends Specification {
 			details.target.group == 'priority2group'
 	}
 
-	def "default Action prioritizes name only second highest"() {
+	def "default dependency resolution action prioritizes name only second highest"() {
 		setup:
 			DependencyResolveDetails details = details('notfound:priority3name:changeme')
-			task.action = defaultTestAction()
+			configureDefaultDependencyResolutionAction(parent)
 		when:
-			task.configure()
+			action.execute(Mock(ResolvableDependencies))
 			config.resolutionStrategy.dependencyResolveRule.execute(details)
 		then:
 			details.target.version == 'priority3nameversion'
-			details.target.name == 'priority3name'
-			details.target.group == 'notfound'
 	}
-
-	def "default Action supports notfound"() {
+	
+	def "default dependency resolution action supports notfound"() {
 		setup:
 			DependencyResolveDetails details = details('notfound:notfound:nochange')
-			task.action = defaultTestAction()
+			configureDefaultDependencyResolutionAction(parent)
 		when:
-			task.configure()
+			action.execute(Mock(ResolvableDependencies))
 			config.resolutionStrategy.dependencyResolveRule.execute(details)
 		then:
 			details.target.version == 'nochange'
 			details.target.name == 'notfound'
 			details.target.group == 'notfound'
 	}
-
-	Action<DependencyResolveDetails> defaultTestAction() {
-		ConfigureResolutionStrategyTask.createDefaultActionFromStream(parent,getClass().getResourceAsStream('test-springio-dependencies'))
+	
+	void configureDefaultDependencyResolutionAction(Project project) {
+		project.springioPlatform {
+			dependencyResolutionAction = PlatformDependenciesBeforeResolveAction.createDefaultActionFromStream(parent, getClass().getResourceAsStream('test-springio-dependencies'))
+		}
 	}
 
 	DependencyResolveDetails details(String path) {

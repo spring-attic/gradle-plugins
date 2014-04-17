@@ -6,15 +6,14 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.testing.Test
 
 /**
- *
  * @author Rob Winch
+ * @author Andy Wilkinson
  */
 class SpringioPlatformPlugin implements Plugin<Project> {
 	static String CHECK_TASK_NAME = 'springioCheck'
 	static String TEST_TASK_NAME = 'springioTest'
 	static String INCOMPLETE_EXCLUDES_TASK_NAME = 'springioIncompleteExcludesCheck'
 	static String ALTERNATIVE_DEPENDENCIES_TASK_NAME = 'springioAlternativeDependenciesCheck'
-	static String CONFIG_RESOLUTION_STRATEGY_TASK_NAME = 'configureSpringioConfiguration'
 
 	@Override
 	void apply(Project project) {
@@ -28,8 +27,10 @@ class SpringioPlatformPlugin implements Plugin<Project> {
 			extendsFrom project.configurations.testRuntime
 		})
 
-		ConfigureResolutionStrategyTask configureSpringioTask = project.tasks.create(CONFIG_RESOLUTION_STRATEGY_TASK_NAME, ConfigureResolutionStrategyTask)
-		configureSpringioTask.configuration = springioTestRuntimeConfig
+		project.extensions.create("springioPlatform", SpringioPlatformExtension)
+
+		springioTestRuntimeConfig.incoming.beforeResolve(
+			new PlatformDependenciesBeforeResolveAction(project: project, configuration: springioTestRuntimeConfig))
 
 		Task springioTest = project.tasks.create(TEST_TASK_NAME)
 
