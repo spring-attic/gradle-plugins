@@ -1,14 +1,10 @@
 package org.springframework.build.gradle.springio.platform
 
-import org.gradle.api.Action
 import org.gradle.api.DefaultTask
-import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.DependencyResolveDetails
 import org.gradle.api.artifacts.ExternalModuleDependency
-import org.gradle.api.artifacts.ModuleVersionSelector
-import org.gradle.api.internal.artifacts.DefaultModuleVersionSelector
-import org.gradle.api.tasks.OutputDirectories
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
@@ -18,6 +14,11 @@ import org.gradle.api.tasks.TaskAction
  * @author Andy Wilkinson
  */
 class IncompleteExcludesTask extends DefaultTask {
+
+	@Optional
+	@Input
+	Collection<Configuration> configurations
+
 	@OutputFile
 	File reportFile = project.file("$project.buildDir/springio/incomplete-excludes.log")
 
@@ -25,8 +26,12 @@ class IncompleteExcludesTask extends DefaultTask {
 	void check() {
 		reportFile.parentFile.mkdirs()
 
+		if(!configurations) {
+			configurations = project.configurations.findAll { !it.name.toLowerCase().contains('test') }
+		}
+
 		def problemsByConfiguration = [:]
-		project.configurations.each { configuration ->
+		configurations.each { configuration ->
 			def problemsByDependency = [:]
 			configuration.dependencies.each { dependency ->
 				if (dependency instanceof ExternalModuleDependency) {
@@ -47,6 +52,7 @@ class IncompleteExcludesTask extends DefaultTask {
 				problemsByConfiguration[configuration.name] = problemsByDependency
 			}
 		}
+
 		if (problemsByConfiguration) {
 			reportFile.withWriterAppend { out ->
 				out.writeLine(project.name)

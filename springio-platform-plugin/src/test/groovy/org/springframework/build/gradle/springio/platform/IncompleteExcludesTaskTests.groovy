@@ -14,10 +14,11 @@ import spock.lang.Specification
 /**
  *
  * @author Rob Winch
+ * @author Andy Wilkinson
  */
 class IncompleteExcludesTaskTests extends Specification {
 	Project parent
-	Task task
+	IncompleteExcludesTask task
 
 	def setup() {
 		parent = ProjectBuilder.builder().withName("parent").build()
@@ -56,6 +57,41 @@ class IncompleteExcludesTaskTests extends Specification {
 			parent.dependencies {
 				compile('org.springframework:spring-core:3.2.0.RELEASE') {
 					exclude group: 'commons-logging', module: 'commons-logging'
+				}
+			}
+		when:
+			task.check()
+		then:
+			noExceptionThrown()
+	}
+
+	def "succeeds with incomplete excludes in test configurations"() {
+		setup:
+			parent.dependencies {
+				testCompile('org.springframework:spring-core:3.2.0.RELEASE') {
+					exclude group: 'commons-logging'
+				}
+				testRuntime('org.springframework:spring-beans:3.2.0.RELEASE') {
+					exclude group: 'commons-logging'
+				}
+			}
+		when:
+			task.check()
+		then:
+			noExceptionThrown()
+	}
+
+	def "succeeds with incomplete exclude in configuration that is not checked"() {
+		setup:
+			task.configurations = parent.configurations.findAll()
+
+			parent.configurations {
+				notChecked
+			}
+
+			parent.dependencies {
+				notChecked('org.springframework:spring-core:3.2.0.RELEASE') {
+					exclude group: 'commons-logging'
 				}
 			}
 		when:
