@@ -1,8 +1,10 @@
 package org.springframework.build.gradle.springio.platform;
 
 import org.gradle.api.Action
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencyResolveDetails
 import org.gradle.api.artifacts.ModuleVersionSelector
 import org.gradle.api.artifacts.ResolvableDependencies
@@ -22,10 +24,28 @@ class PlatformDependenciesBeforeResolveAction implements Action<ResolvableDepend
 	public void execute(ResolvableDependencies resolvableDependencies) {
 		def action = project.springioPlatform.dependencyResolutionAction;
 		if (!action) {
-			action = createDefaultActionFromStream(project,getClass().getResourceAsStream('springio-dependencies')) 
+			action = createDefaultActionFromStream(project, configuration, getClass().getResourceAsStream('springio-dependencies'))
 		}
 		
 		configuration.resolutionStrategy.eachDependency action
+
+		configuration.incoming.afterResolve {
+			if (action instanceof MappingDependencyResolveDetailsAction) {
+				String message
+				if (project.springioPlatform.failOnUnmappedDirectDependency && action.unmappedDirectDependencies) {
+					message = "The following direct dependencies do not have Spring IO versions: " + action.unmappedDirectDependencies.collect { "$it.group:$it.name" }.join(", ")
+				}
+
+				if (project.springioPlatform.failOnUnmappedTransitiveDependency && action.unmappedTransitiveDependencies) {
+					message = message ? message + ". " : ""
+					message += "The following transitive dependencies do not have Spring IO versions: " + action.unmappedTransitiveDependencies.collect { "$it.group:$it.name" }.join(", ")
+				}
+
+				if (message) {
+					throw new InvalidUserDataException(message)
+				}
+			}
+		}
 	}
 
 	/**
@@ -34,7 +54,7 @@ class PlatformDependenciesBeforeResolveAction implements Action<ResolvableDepend
 	 *
 	 * @return
 	 */
-	private static MappingDependencyResolveDetailsAction createDefaultActionFromStream(Project project, InputStream stream) {
+	private static MappingDependencyResolveDetailsAction createDefaultActionFromStream(Project project, Configuration configuration, InputStream stream) {
 		Map<String,ModuleVersionSelector> depToSelector = [:]
 		stream.eachLine { line ->
 			if(line && !line.startsWith('#')) {
@@ -44,11 +64,19 @@ class PlatformDependenciesBeforeResolveAction implements Action<ResolvableDepend
 			}
 		}
 		Set<String> ignoredGroupAndNames = project.rootProject.allprojects.collect { "$it.group:$it.name" }
-		new MappingDependencyResolveDetailsAction(depToSelector : depToSelector, ignoredGroupAndNames : ignoredGroupAndNames)
+		new MappingDependencyResolveDetailsAction(depToSelector : depToSelector, ignoredGroupAndNames : ignoredGroupAndNames, configuration : configuration)
 	}
 
 	private static class MappingDependencyResolveDetailsAction implements Action<DependencyResolveDetails> {
+
+		Configuration configuration
+
 		Map<String,ModuleVersionSelector> depToSelector = [:]
+
+		List<ModuleVersionSelector> unmappedDirectDependencies = []
+
+		List<ModuleVersionSelector> unmappedTransitiveDependencies = []
+
 		/**
 		 * In the format of group:name
 		 */
@@ -64,11 +92,25 @@ class PlatformDependenciesBeforeResolveAction implements Action<ResolvableDepend
 			ModuleVersionSelector mapping = getMapping("$requested.group:$requested.name") ?: (getMapping("$requested.group:") ?: getMapping(":$requested.name"))
 
 			if(!mapping) {
-				//logger.debug("Did NOT find mapping for $requested.group:$requested.name")
+				if (isDirectDependency(requested)) {
+					unmappedDirectDependencies << requested
+				} else {
+					unmappedTransitiveDependencies << requested
+				}
+
 				return
 			}
 
 			details.useTarget new DefaultModuleVersionSelector( mapping.group ?: requested.group, mapping.name ?: requested.name, mapping.version ?: requested.version)
+		}
+
+		private boolean isDirectDependency(ModuleVersionSelector selector) {
+			for (Dependency dependency: configuration.allDependencies) {
+				if (dependency.group == selector.group && dependency.name == selector.name) {
+					return true
+				}
+			}
+			return false
 		}
 
 		private ModuleVersionSelector getMapping(String id) {

@@ -14,9 +14,8 @@ Provides additional checks to ensure springio platform compatibility
 
 == Quick Start
 
-See http://repo.spring.io/repo/org/springframework/build/gradle/springio-platform-plugin/[repo.spring.io] to determine the
-latest available version. Then configure the plugin in your project as
-follows:
+See http://repo.spring.io/repo/org/springframework/build/gradle/springio-platform-plugin/[repo.spring.io] to determine
+the latest available version. Then configure the plugin in your project as follows:
 
 [source,groovy]
 ----
@@ -41,7 +40,9 @@ configure(allprojects) {
 }
 ----
 
-NOTE: It is unlikely you will want to apply the plugin or snapshot repository to all projects. This is particularly true if you have sample projects within your project. Instead, you should limit the plugin to modules that are part of the Spring IO platform.
+NOTE: It is unlikely you will want to apply the plugin or snapshot repository to all projects. This is particularly
+true if you have sample projects within your project. Instead, you should limit the plugin to modules that are part of
+the Spring IO platform.
 
 Now you can run the following:
 
@@ -52,11 +53,17 @@ $ ./gradlew clean springioCheck -PJDK8_HOME=<jdk8-home> -PJDK7_HOME=<jdk7-home>
 
 This will:
 
-* Assist with running tests against your compiled code using JDK7 and JDK8 and the SpringIO dependency versions. For more information refer to <<additional-tests>>
-* Ensure that all dependency exclusions use both the group and the module. For more information refer to <<incompleteexcludestask>>
-* Verify that certain dependencies are not used and suggest alternatives. For more information refer to <<alternativedependenciestask>>
+* Check that Spring IO contains versions for all direct dependencies, all transitive dependencies, or both. For more
+  information refer to <<spring-io-dependencies>>
+* Assist with running tests against your compiled code using JDK7 and JDK8 and the Spring IO dependency versions. For
+  more information refer to <<additional-tests>>
+* Ensure that all dependency exclusions use both the group and the module. For more information refer to
+  <<incompleteexcludestask>>
+* Verify that certain dependencies are not used and suggest alternatives. For more information refer to
+  <<alternativedependenciestask>>
 
-If you would like springioCheck to be invoked when you run `./gradlew build`, then you can make the check task depend on springioCheck as shown below:
+If you would like springioCheck to be invoked when you run `./gradlew build`, then you can make the check task depend
+on springioCheck as shown below:
 
 [source,groovy]
 ----
@@ -71,23 +78,45 @@ configure(allprojects) {
 
 Typically users will keep the springioCheck task separate so as to only run the springioCheck task on the CI server.
 
+== Spring IO dependencies
+
+The plugin creates a new configuration, `springioTestRuntime`, that contains all of the project's dependencies with
+their versions mapped to those that are in the platform. This configuration is used when running the additional
+tests. By default, if a direct dependency is encountered that is not part of the platform the build will fail. This
+can be configured using the `springIoPlatform` extension. For example:
+
+[source,groovy]
+springioPlatform {
+    failOnUnmappedDirectDependency = true
+    failOnUnmappedTransitiveDependency = true
+}
+
+`failOnUnmappedDirectDependency` controls whether or not the build will fail if a direct dependency is encountered that
+is not part of the Spring IO plaform. The default is `true`. `failOnUnmappedTransitiveDependency` controls whether or
+not the build will fail if a transitive dependency is encountered that is not part of the Spring IO platform. The
+default is `false`.
+
 == Additional Tests
 
-One of the goals of the Spring IO platform is to ensure modules work with JDK7 and JDK8 and that they run with specific versions of dependencies. Applying the plugin will create tests that:
+One of the goals of the Spring IO platform is to ensure modules work with JDK7 and JDK8 and that they run with specific
+versions of dependencies. Applying the plugin will create tests that:
 
-* Nothing changes for how your code is actually compiled or consumed by users (dependency changes and JDK changes only impact the additional tests)
+* Nothing changes for how your code is actually compiled or consumed by users (dependency changes and JDK changes only
+  impact the additional tests)
 * Ensure that the Spring IO versions of dependencies are used at runtime for the additional test tasks
 * Tests are ran against the specified JDKs
 * If JDK7_HOME and JDK8_HOME is omitted, then no additional test tasks will be created 
 
-For example, the following will compile the project with the declared dependency versions and JDK. It will then run all the tests against JDK7 and JDK8 with the Spring IO dependency versions.
+For example, the following will compile the project with the declared dependency versions and JDK. It will then run all
+the tests against JDK7 and JDK8 with the Spring IO dependency versions.
 
 [source,bash]
 ----
 $ ./gradlew springioCheck -PJDK7_HOME=/opt/java/jdk/Sun/7.0 -PJDK8_HOME=/opt/java/jdk/Sun/8.0
 ----
 
-Where `JDK8_HOME` is the absolute path to the JDK8 Home and `JDK7_HOME` is the absolute path to the JDK7 Home. The example above works with the Spring Bamboo environment.
+Where `JDK8_HOME` is the absolute path to the JDK8 Home and `JDK7_HOME` is the absolute path to the JDK7 Home. The
+example above works with the Spring Bamboo environment.
 
 [source,bash]
 ----
@@ -98,7 +127,9 @@ NOTE: You can also place JDK8_HOME and JDK7_HOME in your gradle.properties
 
 == IncompleteExcludesTask
 
-This task ensures that any dependency exclusions that are done use both the group and the module because otherwise the dependency will not be excluded in the generated pom.xml file. For example the following is not allowed because it only excludes the module:
+This task ensures that any dependency exclusions that are done use both the group and the module because otherwise the
+dependency will not be excluded in the generated pom.xml file. For example the following is not allowed because it only
+excludes the module:
 
 [source,groovy]
 ----
@@ -133,4 +164,5 @@ dependencies {
 
 == AlternativeDependenciesTask
 
-This task will ensure certain dependencies are not used and suggest alternatives. For example, intead of using asm:asm it is preferred to use spring-core's repackages asm dependencies.
+This task will ensure certain dependencies are not used and suggest alternatives. For example, intead of using asm:asm
+it is preferred to use spring-core's repackages asm dependencies.
