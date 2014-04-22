@@ -55,12 +55,22 @@ This will:
 
 * Check that Spring IO contains versions for all direct dependencies, all transitive dependencies, or both. For more
   information refer to <<spring-io-dependencies>>
-* Assist with running tests against your compiled code using JDK7 and JDK8 and the Spring IO dependency versions. For
-  more information refer to <<additional-tests>>
 * Ensure that all dependency exclusions use both the group and the module. For more information refer to
   <<incompleteexcludestask>>
 * Verify that certain dependencies are not used and suggest alternatives. For more information refer to
   <<alternativedependenciestask>>
+
+Alternatively, you can run the following:
+
+[source,bash]
+----
+$ ./gradlew clean springioCheck -PJDK8_HOME=<jdk8-home> -PJDK7_HOME=<jdk7-home>
+----
+
+In addition to the steps listed above this will also:
+
+* Assist with running tests against your compiled code using JDK7 and JDK8 and the Spring IO dependency versions. For
+  more information refer to <<additional-tests>>
 
 If you would like springioCheck to be invoked when you run `./gradlew build`, then you can make the check task depend
 on springioCheck as shown below:
@@ -95,6 +105,14 @@ springioPlatform {
 is not part of the Spring IO plaform. The default is `true`. `failOnUnmappedTransitiveDependency` controls whether or
 not the build will fail if a transitive dependency is encountered that is not part of the Spring IO platform. The
 default is `false`.
+
+You can use Gradle's built-in `dependencies` task to see details of the `springioTestRuntime` configuration and the
+versions that it contains. For example:
+
+[source,bash]
+----
+$ ./gradlew clean project-name:dependencies
+----
 
 == Additional Tests
 

@@ -64,7 +64,7 @@ class SpringioPlatformPluginTests extends Specification {
 		then:
 			Task sioc = project.tasks.findByName(SpringioPlatformPlugin.CHECK_TASK_NAME)
 			sioc
-			sioc.taskDependencies.getDependencies(sioc) == [springioTestTask, alternativeDependenciesTask, incompleteExcludesTask] as Set
+			sioc.taskDependencies.getDependencies(sioc) == [versionMappingCheckTask, springioTestTask, alternativeDependenciesTask, incompleteExcludesTask] as Set
 	}
 
 	def "Creates springioTest Task"() {
@@ -131,6 +131,14 @@ class SpringioPlatformPluginTests extends Specification {
 			alternativeDependenciesTask instanceof AlternativeDependenciesTask
 	}
 
+	def "Creates springioDependencyVersionMappingCheck task"() {
+		when:
+		project.apply plugin: SpringioPlatformPlugin
+		project.apply plugin: JavaPlugin
+	then:
+		versionMappingCheckTask
+	}
+
 	def getAlternativeDependenciesTask() {
 		project.tasks.findByName(SpringioPlatformPlugin.ALTERNATIVE_DEPENDENCIES_TASK_NAME)
 	}
@@ -149,6 +157,10 @@ class SpringioPlatformPluginTests extends Specification {
 
 	def getJdk8TestTask() {
 		project.tasks.findByName('springioJDK8Test')
+	}
+
+	def getVersionMappingCheckTask() {
+		project.tasks.findByName('springioDependencyVersionMappingCheck')
 	}
 
 	def setupJdks() {

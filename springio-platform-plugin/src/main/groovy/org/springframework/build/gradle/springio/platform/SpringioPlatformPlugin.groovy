@@ -14,6 +14,7 @@ class SpringioPlatformPlugin implements Plugin<Project> {
 	static String TEST_TASK_NAME = 'springioTest'
 	static String INCOMPLETE_EXCLUDES_TASK_NAME = 'springioIncompleteExcludesCheck'
 	static String ALTERNATIVE_DEPENDENCIES_TASK_NAME = 'springioAlternativeDependenciesCheck'
+	static String CHECK_DEPENDENCY_VERSION_MAPPING_TASK_NAME = 'springioDependencyVersionMappingCheck'
 
 	@Override
 	void apply(Project project) {
@@ -41,7 +42,12 @@ class SpringioPlatformPlugin implements Plugin<Project> {
 		Task incompleteExcludesCheck = project.tasks.create(INCOMPLETE_EXCLUDES_TASK_NAME, IncompleteExcludesTask)
 		Task alternativeDependenciesCheck = project.tasks.create(ALTERNATIVE_DEPENDENCIES_TASK_NAME, AlternativeDependenciesTask)
 
+		Task dependencyVersionMappingCheck = project.tasks.create(CHECK_DEPENDENCY_VERSION_MAPPING_TASK_NAME) { task ->
+			task << { springioTestRuntimeConfig.resolvedConfiguration }
+		}
+
 		project.tasks.create(CHECK_TASK_NAME) {
+			dependsOn dependencyVersionMappingCheck
 			dependsOn springioTest
 			dependsOn incompleteExcludesCheck
 			dependsOn alternativeDependenciesCheck
