@@ -16,4 +16,16 @@ class SpringioPlatformExtension {
 	 * @see ResolutionStrategy#eachDependency
 	 */
 	def dependencyResolutionAction
+
+	/**
+	 * Controls whether or not the build will fail when a direct dependency that does not
+	 * have a Spring IO version mapping is encountered. Defaults to {@code true}.
+	 */
+	def failOnUnmappedDirectDependency = true
+
+	/**
+	 * Controls whether or not the build will fail when a transitive dependency that does
+	 * not have a Spring IO version mapping is encountered. Defaults to {@code false}.
+	 */
+	def failOnUnmappedTransitiveDependency = false
 }
