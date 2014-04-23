@@ -62,8 +62,10 @@ class SpringioPlatformPlugin implements Plugin<Project> {
 		Test springioJdkTest = project.tasks.create("springio${jdk}Test", Test)
 		project.configure(springioJdkTest) {
 			classpath = project.sourceSets.test.output + project.sourceSets.main.output + springioTestRuntimeConfig
-			testResultsDir = project.file("$project.buildDir/springio-$jdk-test-results/")
-			testReportDir = project.file("$project.buildDir/reports/springio-$jdk-tests/")
+			reports {
+				html.destination = project.file("$project.buildDir/reports/springio-$jdk-tests/")
+				junitXml.destination = project.file("$project.buildDir/springio-$jdk-test-results/")
+			}
 		}
 		springioTest.dependsOn springioJdkTest
 	}
