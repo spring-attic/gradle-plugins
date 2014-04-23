@@ -34,7 +34,7 @@ class AlternativeDependenciesTaskTests extends Specification {
 			parent.dependencies {
 				compile 'asm:asm:3.3.1'
 			}
-			task.alternaives = ['asm:asm' : 'Please use some alternative']
+			task.alternatives = ['asm:asm' : 'Please use some alternative']
 		when:
 			task.check()
 		then:
@@ -46,7 +46,7 @@ class AlternativeDependenciesTaskTests extends Specification {
 			parent.dependencies {
 				testCompile 'cglib:cglib:3.3.1'
 			}
-			task.alternaives = ['cglib:cglib' : 'Please use some alternative']
+			task.alternatives = ['cglib:cglib' : 'Please use some alternative']
 		when:
 			task.check()
 		then: 'No error since many testing frameworks (i.e. mocking frameworks) require cglib'
