@@ -14,7 +14,7 @@ Provides additional checks to ensure springio platform compatibility
 
 == Quick Start
 
-See https://github.com/SpringSource/gradle-plugins/tags[tags] to determine the
+See http://repo.spring.io/repo/org/springframework/build/gradle/springio-platform-plugin/[repo.spring.io] to determine the
 latest available version. Then configure the plugin in your project as
 follows:
 
@@ -25,7 +25,7 @@ buildscript {
         maven { url 'https://repo.spring.io/plugins-snapshot' }
     }
     dependencies {
-        classpath 'org.springframework.build.gradle:springio-platform-plugin:0.0.1.BUILD-SNAPSHOT'
+        classpath 'org.springframework.build.gradle:springio-platform-plugin:0.0.2.BUILD-SNAPSHOT'
     }
 }
 
