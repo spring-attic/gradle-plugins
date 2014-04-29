@@ -66,8 +66,8 @@ configure(allprojects) {
 
 One of the goals of the SpringIO platform is to ensure modules work with JDK7 and JDK8 and that they run with specific versions of dependencies. Applying the plugin will create tests that:
 
-* Nothing changes for how your code is actually compiled
-* Ensure that the Spring IO versions of dependencies are used at runtime
+* Nothing changes for how your code is actually compiled or consumed by users (dependency changes and JDK changes only impact the additional tests)
+* Ensure that the Spring IO versions of dependencies are used at runtime for the additional test tasks
 * Tests are ran against the specified JDKs
 
 For example, the following will compile the project with the declared dependency versions and JDK. It will then run all the tests against JDK7 and JDK8 with the Spring IO dependency versions.
