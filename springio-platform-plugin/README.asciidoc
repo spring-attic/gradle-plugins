@@ -33,8 +33,15 @@ buildscript {
 
 configure(allprojects) {
     apply plugin: 'springio-platform'
+    
+    // necessary to resolve the Spring IO versions (which include snapshots)
+    repositories {
+       maven { url "https://repo.spring.io/libs-snapshot" }
+    }
 }
 ----
+
+NOTE: It is unlikely you will want to apply the plugin or snapshot repository to all projects. This is particularly true if you have sample projects within your project. Instead, you should limit the plugin to modules that are part of the Spring IO platform.
 
 Now you can run the following:
 
