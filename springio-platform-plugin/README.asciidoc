@@ -47,7 +47,7 @@ Now you can run the following:
 
 [source,bash]
 ----
-$ gradlew clean springioCheck -PJDK8_HOME=<jdk8-home> -PJDK7_HOME=<jdk7-home>
+$ ./gradlew clean springioCheck -PJDK8_HOME=<jdk8-home> -PJDK7_HOME=<jdk7-home>
 ----
 
 This will:
@@ -56,7 +56,7 @@ This will:
 * Ensure that all dependency exclusions use both the group and the module. For more information refer to <<incompleteexcludestask>>
 * Verify that certain dependencies are not used and suggest alternatives. For more information refer to <<alternativedependenciestask>>
 
-If you would like springioCheck to be part of your standard build, then you can make the check task depend on springioCheck as shown below:
+If you would like springioCheck to be invoked when you run `./gradlew build`, then you can make the check task depend on springioCheck as shown below:
 
 [source,groovy]
 ----
@@ -69,26 +69,29 @@ configure(allprojects) {
 }
 ----
 
+Typically users will keep the springioCheck task separate so as to only run the springioCheck task on the CI server.
+
 == Additional Tests
 
-One of the goals of the SpringIO platform is to ensure modules work with JDK7 and JDK8 and that they run with specific versions of dependencies. Applying the plugin will create tests that:
+One of the goals of the Spring IO platform is to ensure modules work with JDK7 and JDK8 and that they run with specific versions of dependencies. Applying the plugin will create tests that:
 
 * Nothing changes for how your code is actually compiled or consumed by users (dependency changes and JDK changes only impact the additional tests)
 * Ensure that the Spring IO versions of dependencies are used at runtime for the additional test tasks
 * Tests are ran against the specified JDKs
+* If JDK7_HOME and JDK8_HOME is omitted, then no additional test tasks will be created 
 
 For example, the following will compile the project with the declared dependency versions and JDK. It will then run all the tests against JDK7 and JDK8 with the Spring IO dependency versions.
 
 [source,bash]
 ----
-$ gradlew springioCheck -PJDK8_HOME=<jdk8-home> -PJDK7_HOME=<jdk7-home>
+$ ./gradlew springioCheck -PJDK7_HOME=/opt/java/jdk/Sun/7.0 -PJDK8_HOME=/opt/java/jdk/Sun/8.0
 ----
 
-Where `<jdk8-home>` is the absolute path to the JDK8 Home and `<jdk7-home>` is the absolute path to the JDK7 Home. For example, an real example might look like:
+Where `JDK8_HOME` is the absolute path to the JDK8 Home and `JDK7_HOME` is the absolute path to the JDK7 Home. The example above works with the Spring Bamboo environment.
 
 [source,bash]
 ----
-gradlew springioCheck -PJDK8_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home -PJDK7_HOME=/Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home
+./gradlew springioCheck 
 ----
 
 NOTE: You can also place JDK8_HOME and JDK7_HOME in your gradle.properties
