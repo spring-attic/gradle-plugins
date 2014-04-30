@@ -12,7 +12,7 @@ buildscript {
         maven { url 'http://repo.spring.io/plugins-release' }
     }
     dependencies {
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.5'
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
     }
 }
 
