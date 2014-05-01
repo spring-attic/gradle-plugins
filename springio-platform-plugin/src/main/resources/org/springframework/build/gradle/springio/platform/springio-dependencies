@@ -110,6 +110,7 @@ net.sf.ehcache:ehcache-core:2.6.5
 net.sf.jasperreports:jasperreports:5.5.1
 net.sf.jopt-simple:jopt-simple:4.6
 net.sourceforge.jexcelapi:jxl:2.6.12
+net.sourceforge.nekohtml:nekohtml:1.9.20
 nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:1.2.2
 opensymphony:ognl:2.6.11
 opensymphony:sitemesh:2.4
@@ -252,6 +253,7 @@ org.hibernate:hibernate-validator:4.3.1.Final
 org.hsqldb:hsqldb:2.3.2
 org.igniterealtime.smack:smack:3.2.1
 org.igniterealtime.smack:smackx:3.2.1
+org.jasig.cas.client:cas-client-core:3.2.1
 org.jibx:jibx-run:1.2.5
 org.jolokia:jolokia-core:1.2.0
 org.jredis:jredis-core-api:06052013
