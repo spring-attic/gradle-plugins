@@ -10,7 +10,7 @@ Rob Winch
 :doctype: book
 
 == Overview
-Provides additional checks to ensure springio platform compatibility
+Provides additional checks to ensure Spring IO platform compatibility
 
 == Quick Start
 
@@ -48,17 +48,17 @@ Now you can run the following:
 
 [source,bash]
 ----
-$ ./gradlew clean springioCheck -PJDK8_HOME=<jdk8-home> -PJDK7_HOME=<jdk7-home>
+$ ./gradlew clean springioCheck
 ----
 
-This will:
+This will execute tasks that:
 
 * Check that Spring IO contains versions for all direct dependencies, all transitive dependencies, or both. For more
-  information refer to <<spring-io-dependencies>>
+  information refer to the <<springiodependencyversionmappingcheck, description of the task>>
 * Ensure that all dependency exclusions use both the group and the module. For more information refer to
-  <<incompleteexcludestask>>
-* Verify that certain dependencies are not used and suggest alternatives. For more information refer to
-  <<alternativedependenciestask>>
+  the <<springioincompleteexcludescheck, description of the task>>
+* Verify that certain dependencies are not used and suggest alternatives if they are. For more information
+  refer to the <<springioalternativedependenciescheck, description of the task>>
 
 Alternatively, you can run the following:
 
@@ -67,10 +67,10 @@ Alternatively, you can run the following:
 $ ./gradlew clean springioCheck -PJDK8_HOME=<jdk8-home> -PJDK7_HOME=<jdk7-home>
 ----
 
-In addition to the steps listed above this will also:
+In addition to the steps listed above this will execute tasks that:
 
-* Assist with running tests against your compiled code using JDK7 and JDK8 and the Spring IO dependency versions. For
-  more information refer to <<additional-tests>>
+* Running tests against your compiled code using JDK7 and JDK8 and the Spring IO dependency versions. For more
+information refer to <<additional-tests, Additional Tests>>
 
 If you would like springioCheck to be invoked when you run `./gradlew build`, then you can make the check task depend
 on springioCheck as shown below:
@@ -92,19 +92,7 @@ Typically users will keep the springioCheck task separate so as to only run the 
 
 The plugin creates a new configuration, `springioTestRuntime`, that contains all of the project's dependencies with
 their versions mapped to those that are in the platform. This configuration is used when running the additional
-tests. By default, if a direct dependency is encountered that is not part of the platform the build will fail. This
-can be configured using the `springIoPlatform` extension. For example:
-
-[source,groovy]
-springioPlatform {
-    failOnUnmappedDirectDependency = true
-    failOnUnmappedTransitiveDependency = true
-}
-
-`failOnUnmappedDirectDependency` controls whether or not the build will fail if a direct dependency is encountered that
-is not part of the Spring IO plaform. The default is `true`. `failOnUnmappedTransitiveDependency` controls whether or
-not the build will fail if a transitive dependency is encountered that is not part of the Spring IO platform. The
-default is `false`.
+tests.
 
 You can use Gradle's built-in `dependencies` task to see details of the `springioTestRuntime` configuration and the
 versions that it contains. For example:
@@ -143,7 +131,11 @@ example above works with the Spring Bamboo environment.
 
 NOTE: You can also place JDK8_HOME and JDK7_HOME in your gradle.properties
 
-== IncompleteExcludesTask
+== Sub-tasks
+
+The plugin adds a number of tasks to your build. These are documented below.
+
+=== springioIncompleteExcludesCheck
 
 This task ensures that any dependency exclusions that are done use both the group and the module because otherwise the
 dependency will not be excluded in the generated pom.xml file. For example the following is not allowed because it only
@@ -152,9 +144,9 @@ excludes the module:
 [source,groovy]
 ----
 dependencies {
-	compile('org.springframework:spring-core:3.2.0.RELEASE') {
-		exclude module: 'commons-logging'
-	}
+    compile('org.springframework:spring-core:3.2.0.RELEASE') {
+        exclude module: 'commons-logging'
+    }
 }
 ----
 
@@ -163,9 +155,9 @@ the following is not allowed because it only excludes the group:
 [source,groovy]
 ----
 dependencies {
-	compile('org.springframework:spring-core:3.2.0.RELEASE') {
-		exclude group: 'commons-logging'
-	}
+    compile('org.springframework:spring-core:3.2.0.RELEASE') {
+        exclude group: 'commons-logging'
+    }
 }
 ----
 
@@ -180,7 +172,26 @@ dependencies {
 }
 ----
 
-== AlternativeDependenciesTask
+=== springioAlternativeDependenciesCheck
 
 This task will ensure certain dependencies are not used and suggest alternatives. For example, intead of using asm:asm
 it is preferred to use spring-core's repackages asm dependencies.
+
+=== springioDependencyVersionMappingCheck
+
+This task will check that every dependency in a configuration can be mapped to a dependency that's part of the
+Spring IO Platform. By default, the task will perform this check against the `runtime` configuration. The build will
+fail if unmapped direct dependencies are found, but unmapped transitive dependencies will not cause a failure. All
+three options can be configured:
+
+[source,groovy]
+springioDependencyVersionMappingCheck {
+    configuration = configurations.testRuntime
+    failOnUnmappedDirectDependency = true
+    failOnUnmappedTransitiveDependency = true
+}
+
+`configuration` determines the configuration that is checked. `failOnUnmappedDirectDependency` controls whether or not
+the build will fail if a direct dependency is encountered that is not part of the Spring IO plaform. The default is
+`true`. `failOnUnmappedTransitiveDependency` controls whether or not the build will fail if a transitive dependency is
+encountered that is not part of the Spring IO platform. The default is `false`.

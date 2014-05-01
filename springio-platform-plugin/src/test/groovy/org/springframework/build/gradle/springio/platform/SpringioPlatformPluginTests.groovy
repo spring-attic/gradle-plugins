@@ -49,14 +49,6 @@ class SpringioPlatformPluginTests extends Specification {
 			project.configurations.springioTestRuntime.extendsFrom.contains(project.configurations.testRuntime)
 	}
 
-	def "Sets up springIoPlatformExtension"() {
-		when:
-			project.apply plugin: SpringioPlatformPlugin
-			project.apply plugin: JavaPlugin
-		then:
-			project.springioPlatform
-	}
-
 	def "Creates springioCheck Task"() {
 		when:
 			project.apply plugin: SpringioPlatformPlugin
