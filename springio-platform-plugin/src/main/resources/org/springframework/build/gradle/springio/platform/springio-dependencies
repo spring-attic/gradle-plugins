@@ -177,9 +177,9 @@ org.apache.tomcat:tomcat-dbcp:7.0.52
 org.apache.tomcat:tomcat7-websocket:7.0.52
 org.apache.velocity:velocity:1.7
 org.apache.xmlbeans:xmlbeans:2.6.0
-org.aspectj:aspectjrt:1.8.0.RELEASE
-org.aspectj:aspectjtools:1.8.0.RELEASE
-org.aspectj:aspectjweaver:1.8.0.RELEASE
+org.aspectj:aspectjrt:1.8.0
+org.aspectj:aspectjtools:1.8.0
+org.aspectj:aspectjweaver:1.8.0
 org.atteo:evo-inflector:1.0.1
 org.beanshell:bsh:2.0b4
 org.bouncycastle:bcpkix-jdk15on:1.47
