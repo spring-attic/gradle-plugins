@@ -1,6 +1,7 @@
 package org.springframework.build.gradle.springio.platform
 
 import com.google.common.io.Files
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.*
 import org.gradle.api.plugins.GroovyPlugin
 import org.gradle.api.plugins.JavaPlugin
@@ -19,7 +20,11 @@ class SpringioPlatformPluginTests extends Specification {
 
 	def setup() {
 		project = ProjectBuilder.builder().build()
-		def java = new File(jdkHome,'bin/java')
+		def javaExecFilePath = '/bin/java'
+		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+			javaExecFilePath += '.exe'
+		}
+		def java = new File(jdkHome, javaExecFilePath)
 		java.parentFile.mkdirs()
 		java.createNewFile()
 	}
