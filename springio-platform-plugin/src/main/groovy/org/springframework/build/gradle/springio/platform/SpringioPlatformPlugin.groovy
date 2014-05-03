@@ -1,10 +1,13 @@
 package org.springframework.build.gradle.springio.platform
 
-import org.gradle.api.*
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.testing.Test
 
+import org.apache.tools.ant.taskdefs.condition.Os
 /**
  * @author Rob Winch
  * @author Andy Wilkinson
@@ -38,9 +41,9 @@ class SpringioPlatformPlugin implements Plugin<Project> {
 		}
 
 		Task incompleteExcludesCheck = project.tasks.create(INCOMPLETE_EXCLUDES_TASK_NAME, IncompleteExcludesTask)
-		Task alternativeDependenciesCheck = project.tasks.create(ALTERNATIVE_DEPENDENCIES_TASK_NAME, AlternativeDependenciesTask)		
+		Task alternativeDependenciesCheck = project.tasks.create(ALTERNATIVE_DEPENDENCIES_TASK_NAME, AlternativeDependenciesTask)
 		Task dependencyVersionMappingCheck = project.tasks.create(CHECK_DEPENDENCY_VERSION_MAPPING_TASK_NAME, DependencyVersionMappingCheckTask)
-		
+
 		project.tasks.create(CHECK_TASK_NAME) {
 			dependsOn dependencyVersionMappingCheck
 			dependsOn springioTest
@@ -55,7 +58,11 @@ class SpringioPlatformPlugin implements Plugin<Project> {
 			return
 		}
 		def jdkHome = project."${whichJdk}"
-		def exec = new File(jdkHome,'/bin/java')
+		def javaExecFilePath = '/bin/java'
+		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+			javaExecFilePath += '.exe'
+		}
+		def exec = new File(jdkHome, javaExecFilePath)
 		if(!exec.exists()) {
 			throw new IllegalStateException("The path $exec does not exist! Please ensure to define a valid JDK home as a commandline argument using -P${whichJdk}=<path>")
 		}
