@@ -17,7 +17,7 @@ class IncompleteExcludesTask extends DefaultTask {
 
 	@Optional
 	@Input
-	Collection<Configuration> configurations
+	Collection<Configuration> configurations = project.configurations.findAll { !it.name.toLowerCase().contains('test') }
 
 	@OutputFile
 	File reportFile = project.file("$project.buildDir/springio/incomplete-excludes.log")
@@ -25,10 +25,6 @@ class IncompleteExcludesTask extends DefaultTask {
 	@TaskAction
 	void check() {
 		reportFile.parentFile.mkdirs()
-
-		if(!configurations) {
-			configurations = project.configurations.findAll { !it.name.toLowerCase().contains('test') }
-		}
 
 		def problemsByConfiguration = [:]
 		configurations.each { configuration ->
