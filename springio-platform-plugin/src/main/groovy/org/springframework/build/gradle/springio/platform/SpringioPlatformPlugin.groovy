@@ -67,6 +67,7 @@ class SpringioPlatformPlugin implements Plugin<Project> {
 				html.destination = project.file("$project.buildDir/reports/springio-$jdk-tests/")
 				junitXml.destination = project.file("$project.buildDir/springio-$jdk-test-results/")
 			}
+			executable exec
 		}
 		springioTest.dependsOn springioJdkTest
 	}

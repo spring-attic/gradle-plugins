@@ -16,10 +16,11 @@ class SpringioPlatformPluginTests extends Specification {
 	Project project
 	@AutoCleanup("deleteDir")
 	File jdkHome = Files.createTempDir()
+	File java
 
 	def setup() {
 		project = ProjectBuilder.builder().build()
-		def java = new File(jdkHome,'bin/java')
+		java = new File(jdkHome,'bin/java')
 		java.parentFile.mkdirs()
 		java.createNewFile()
 	}
@@ -79,6 +80,7 @@ class SpringioPlatformPluginTests extends Specification {
 			project.apply plugin: JavaPlugin
 		then:
 			jdk7TestTask
+			jdk7TestTask.executable == java.absolutePath
 	}
 
 	def "Does not create springioJDK7Test if JDK7_HOME missing Task"() {
@@ -97,6 +99,7 @@ class SpringioPlatformPluginTests extends Specification {
 			project.apply plugin: JavaPlugin
 		then:
 			jdk8TestTask
+			jdk8TestTask.executable == java.absolutePath
 	}
 
 	def "Does not create springioJDK8Test if JDK8_HOME missing Task"() {
