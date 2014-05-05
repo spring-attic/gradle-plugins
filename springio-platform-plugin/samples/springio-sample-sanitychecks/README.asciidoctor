@@ -1,0 +1,59 @@
+Provides some sanity checks to ensure the plugin is working.
+
+Using JDK6 run the following command:
+
+```
+gradlew clean build springioCheck -PJDK8_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home -PJDK7_HOME=/Library/Java/JavaVirtualMachines/jdk1.7.0_40.jdk/Contents/Home --continue
+```
+
+NOTE: You will need to replace JDK7_HOME and JDK8_HOME with the paths to your JDK locations
+
+You should expect something similar to the following output:
+
+```
+FAILURE: Build completed with 3 failures.
+
+1: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':springioAlternativeDependenciesCheck'.
+> Found dependencies that have better alternatives. See /Users/rwinch/code/gradle-plugins/springio-platform-plugin/samples/springio-sample-sanitychecks/build/springio/alternative-dependencies.log for a detailed report
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.
+==============================================================================
+
+2: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':springioDependencyVersionMappingCheck'.
+> The following direct dependencies do not have Spring IO versions: cglib:cglib, asm:asm
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.
+==============================================================================
+
+3: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':springioIncompleteExcludesCheck'.
+> Found incomplete dependency exclusions. See /Users/rwinch/code/gradle-plugins/springio-platform-plugin/samples/springio-sample-sanitychecks/build/springio/incomplete-excludes.log for a detailed report
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.
+==============================================================================
+
+BUILD FAILED
+
+Total time: 9.984 secs
+```
+
+You should also verify there is output in the following locations
+
+```
+├── build
+│   ├── reports
+│   │   ├── springio-JDK7-tests
+│   │   ├── springio-JDK8-tests
+│   │   └── tests
+```
