@@ -128,10 +128,20 @@ class SpringioPlatformPluginTests extends Specification {
 
 	def "Creates springioDependencyVersionMappingCheck task"() {
 		when:
-		project.apply plugin: SpringioPlatformPlugin
-		project.apply plugin: JavaPlugin
-	then:
-		versionMappingCheckTask
+			project.apply plugin: SpringioPlatformPlugin
+			project.apply plugin: JavaPlugin
+		then:
+			versionMappingCheckTask
+	}
+
+	def 'gh-36: finds java exec on Windows'() {
+		expect:
+			SpringioPlatformPlugin.createRelativeJavaExec(true) == '/bin/java.exe'
+	}
+
+	def 'gh-36: finds java exec on non Windows'() {
+		expect:
+		SpringioPlatformPlugin.createRelativeJavaExec(false) == '/bin/java'
 	}
 
 	def getAlternativeDependenciesTask() {
