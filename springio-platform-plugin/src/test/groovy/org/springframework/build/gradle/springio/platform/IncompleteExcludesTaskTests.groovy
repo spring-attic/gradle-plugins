@@ -99,9 +99,4 @@ class IncompleteExcludesTaskTests extends Specification {
 		then:
 			noExceptionThrown()
 	}
-
-	def "configurations eagerly to prevent false positive UP-TO-DATE check"() {
-		expect:
-		task.configurations
-	}
 }

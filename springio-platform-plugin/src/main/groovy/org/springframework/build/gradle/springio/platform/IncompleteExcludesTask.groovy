@@ -15,16 +15,17 @@ import org.gradle.api.tasks.TaskAction
  */
 class IncompleteExcludesTask extends DefaultTask {
 
-	@Optional
-	@Input
-	Collection<Configuration> configurations = project.configurations.findAll { !it.name.toLowerCase().contains('test') }
+	Collection<Configuration> configurations
 
-	@OutputFile
 	File reportFile = project.file("$project.buildDir/springio/incomplete-excludes.log")
 
 	@TaskAction
 	void check() {
 		reportFile.parentFile.mkdirs()
+
+		if (!configurations) {
+			configurations = project.configurations.findAll { !it.name.toLowerCase().contains('test') }
+		}
 
 		def problemsByConfiguration = [:]
 		configurations.each { configuration ->

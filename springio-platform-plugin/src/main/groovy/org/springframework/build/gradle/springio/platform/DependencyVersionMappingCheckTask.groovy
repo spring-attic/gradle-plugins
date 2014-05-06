@@ -9,8 +9,6 @@ import org.gradle.api.tasks.TaskAction
 
 class DependencyVersionMappingCheckTask extends DefaultTask {
 
-	@Input
-	@Optional
 	Configuration configuration
 
 	@Input

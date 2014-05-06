@@ -15,15 +15,12 @@ import org.gradle.api.tasks.TaskAction
  */
 class AlternativeDependenciesTask extends DefaultTask {
 
-	@OutputFile
 	File reportFile = project.file("$project.buildDir/springio/alternative-dependencies.log")
 
 	@Input
 	@Optional
 	Map<String,String> alternatives
 
-	@Input
-	@Optional
 	Collection<Configuration> configurations
 
 	@TaskAction
