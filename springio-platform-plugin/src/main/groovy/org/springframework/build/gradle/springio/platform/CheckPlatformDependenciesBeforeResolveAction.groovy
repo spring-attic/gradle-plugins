@@ -22,15 +22,16 @@ class CheckPlatformDependenciesBeforeResolveAction extends AbstractPlatformDepen
 		configuration.incoming.afterResolve {
 			String message
 			if (failOnUnmappedDirectDependency && checkingAction.unmappedDirectDependencies) {
-				message = "The following direct dependencies do not have Spring IO versions: " + checkingAction.unmappedDirectDependencies.collect { "$it.group:$it.name" }.join(", ")
+				message = "The following direct dependencies do not have Spring IO versions: \n" + checkingAction.unmappedDirectDependencies.collect { "    - $it.group:$it.name" }.join("\n")
 			}
 
 			if (failOnUnmappedTransitiveDependency && checkingAction.unmappedTransitiveDependencies) {
 				message = message ? message + ". " : ""
-				message += "The following transitive dependencies do not have Spring IO versions: " + checkingAction.unmappedTransitiveDependencies.collect { "$it.group:$it.name" }.join(", ")
+				message += "The following transitive dependencies do not have Spring IO versions: \n" + checkingAction.unmappedTransitiveDependencies.collect { "    - $it.group:$it.name" }.join("\n")
 			}
 
 			if (message) {
+				message += "\nPlease refer to the plugin's README for further instructions: https://github.com/spring-projects/gradle-plugins/tree/master/springio-platform-plugin#dealing-with-unmapped-dependencies"
 				throw new InvalidUserDataException(message)
 			}
 		}

@@ -195,3 +195,11 @@ springioDependencyVersionMappingCheck {
 the build will fail if a direct dependency is encountered that is not part of the Spring IO plaform. The default is
 `true`. `failOnUnmappedTransitiveDependency` controls whether or not the build will fail if a transitive dependency is
 encountered that is not part of the Spring IO platform. The default is `false`.
+
+==== Dealing with unmapped dependencies
+
+If you encounter an unmapped dependency, the Platform team can help. First of all, please check for an
+https://github.com/spring-io/platform/issues[existing issue]. If you find one, add a comment to note your need for the
+dependency. If there is no existing issue, please https://github.com/spring-io/platform/issues/new[open one], providing
+details of the dependency and the project that requires it.
+
