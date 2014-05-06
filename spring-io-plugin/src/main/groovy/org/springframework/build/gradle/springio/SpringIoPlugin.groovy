@@ -1,6 +1,5 @@
 package org.springframework.build.gradle.springio
 
-import org.apache.maven.artifact.ant.shaded.Os
 import org.gradle.api.*
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPlugin
@@ -56,7 +55,7 @@ class SpringIoPlugin implements Plugin<Project> {
 			return
 		}
 		def jdkHome = project."${whichJdk}"
-		def exec = new File(jdkHome, createRelativeJavaExec(Os.isFamily(Os.FAMILY_WINDOWS)))
+		def exec = new File(jdkHome, createRelativeJavaExec(isWindows()))
 		if(!exec.exists()) {
 			throw new IllegalStateException("The path $exec does not exist! Please ensure to define a valid JDK home as a command-line argument using -P${whichJdk}=<path>")
 		}
@@ -75,5 +74,9 @@ class SpringIoPlugin implements Plugin<Project> {
 
 	static createRelativeJavaExec(boolean isWindows) {
 		isWindows ? '/bin/java.exe' : '/bin/java'
+	}
+
+	static isWindows() {
+		File.pathSeparatorChar == ';'
 	}
 }
