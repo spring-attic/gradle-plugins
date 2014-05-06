@@ -1,5 +1,2 @@
-# prioritygroup:priorityname:prioritygroupandnameversion
-# priority2group:priority2name:priority2groupandnameversion
-# priority3group:priority2name:priority3groupandnameversion
-standardgroup:standardname:standardversion
-thisprojectgroup:child:shouldnotbeusedversion
+standardgroup\:standardname=standardversion
+thisprojectgroup\:child=shouldnotbeusedversion

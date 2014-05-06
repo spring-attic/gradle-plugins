@@ -20,32 +20,34 @@ abstract class AbstractPlatformDependenciesBeforeResolveAction implements Action
 
 	Configuration configuration
 
-	String resource = 'springio-dependencies'
+	String resource = 'springio-dependencies.properties'
 
 	@Override
 	public void execute(ResolvableDependencies resolvableDependencies) {
-		Map<String, ModuleVersionSelector> selectors = createSelectorsFromStream(getClass().getResourceAsStream(resource))
-		doExecute(resolvableDependencies, selectors)
+		Properties properties = new Properties()
+		Map<String, ModuleVersionSelector> selectors
+		getClass().getResource(resource).withInputStream { is ->
+			properties.load(is)
+		}
+		doExecute(resolvableDependencies, createSelectorsFromProperties(properties))
 	}
 
 	abstract void doExecute(ResolvableDependencies resolvableDependencies, Map<String, ModuleVersionSelector> selectors)
 
 	/**
-	 * Reads the given stream, each line of which is expected to be in the format {@code group:artifact:version}, and
-	 * returns a {@code Map<String, ModuleVersionSelector>} where the keys are of the form {@code group:version} and
-	 * the values are ModuleVersion selectors created with {@code group}, {@code name}, and {@code version}.
+	 * Uses the given Properties of the form {@code group:name=version} and returns a
+	 * {@code Map<String, ModuleVersionSelector>} where the keys are of the form {@code group:version} and the values
+	 * are ModuleVersion selectors created with {@code group}, {@code name}, and {@code version}.
 	 *
-	 * @param stream The stream to read the dependency information from
+	 * @param Properties The dependency information
 	 *
 	 * @return The map of selectors
 	 */
-	private Map<String, ModuleVersionSelector> createSelectorsFromStream(InputStream stream) {
+	private Map<String, ModuleVersionSelector> createSelectorsFromProperties(Properties properties) {
 		Map<String,ModuleVersionSelector> depToSelector = [:]
-		stream.eachLine { line ->
-			if(line && !line.startsWith('#')) {
-				def (group, name, version) = line.split(':')
-				depToSelector.put("$group:$name" as String, new DefaultModuleVersionSelector(group, name, version))
-			}
+		properties.each { key, version ->
+			def (group, name) = key.split(':')
+			depToSelector.put("$group:$name" as String, new DefaultModuleVersionSelector(group, name, version))
 		}
 		depToSelector
 	}
