@@ -30,7 +30,15 @@ class CheckPlatformDependenciesBeforeResolveActionTests extends Specification {
 		parent.version = 'nochange'
 
 		config = parent.configurations.create('configuration')
-		action = new CheckPlatformDependenciesBeforeResolveAction(project: parent, configuration: config, resource: 'test-spring-io-dependencies')
+
+		Configuration versionsConfiguration = parent.configurations.create('versions')
+		def versionsFile = new File('src/test/resources/org/springframework/build/gradle/springio/test-spring-io-dependencies.properties').getAbsoluteFile()
+		def files = parent.files(versionsFile)
+		parent.dependencies {
+			versions files
+		}
+
+		action = new CheckPlatformDependenciesBeforeResolveAction(project: parent, configuration: config, versionsConfiguration: versionsConfiguration)
 
 		child = ProjectBuilder.builder().withName('child').withParent(parent).build()
 		child.group = parent.group

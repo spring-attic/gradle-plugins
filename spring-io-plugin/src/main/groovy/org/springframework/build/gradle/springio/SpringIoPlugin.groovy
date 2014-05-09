@@ -28,8 +28,11 @@ class SpringIoPlugin implements Plugin<Project> {
 			extendsFrom project.configurations.testRuntime
 		})
 
+		Configuration springioVersionsConfig = project.configurations.create('springIoVersions')
+
 		springioTestRuntimeConfig.incoming.beforeResolve(
-			new MapPlatformDependenciesBeforeResolveAction(project: project, configuration: springioTestRuntimeConfig))
+			new MapPlatformDependenciesBeforeResolveAction(project: project, configuration: springioTestRuntimeConfig,
+					versionsConfiguration: springioVersionsConfig))
 
 		Task springioTest = project.tasks.create(TEST_TASK_NAME)
 
@@ -39,7 +42,9 @@ class SpringIoPlugin implements Plugin<Project> {
 
 		Task incompleteExcludesCheck = project.tasks.create(INCOMPLETE_EXCLUDES_TASK_NAME, IncompleteExcludesTask)
 		Task alternativeDependenciesCheck = project.tasks.create(ALTERNATIVE_DEPENDENCIES_TASK_NAME, AlternativeDependenciesTask)
-		Task dependencyVersionMappingCheck = project.tasks.create(CHECK_DEPENDENCY_VERSION_MAPPING_TASK_NAME, DependencyVersionMappingCheckTask)
+		DependencyVersionMappingCheckTask dependencyVersionMappingCheck =
+			project.tasks.create(CHECK_DEPENDENCY_VERSION_MAPPING_TASK_NAME, DependencyVersionMappingCheckTask)
+		dependencyVersionMappingCheck.versionsConfiguration = springioVersionsConfig
 
 		project.tasks.create(CHECK_TASK_NAME) {
 			dependsOn dependencyVersionMappingCheck

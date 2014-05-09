@@ -9,6 +9,8 @@ import org.gradle.api.tasks.TaskAction
 
 class DependencyVersionMappingCheckTask extends DefaultTask {
 
+	Configuration versionsConfiguration
+
 	Configuration configuration
 
 	@Input
@@ -27,6 +29,7 @@ class DependencyVersionMappingCheckTask extends DefaultTask {
 
 		configuration.incoming.beforeResolve(
 			new CheckPlatformDependenciesBeforeResolveAction(project: project, configuration: configuration,
+				versionsConfiguration: versionsConfiguration,
 				failOnUnmappedDirectDependency: failOnUnmappedDirectDependency,
 				failOnUnmappedTransitiveDependency: failOnUnmappedTransitiveDependency))
 

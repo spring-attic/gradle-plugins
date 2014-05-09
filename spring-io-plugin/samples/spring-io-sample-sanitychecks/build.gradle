@@ -15,6 +15,7 @@ repositories {
 	mavenCentral()
 	maven { url 'https://repo.spring.io/libs-snapshot'}
 }
+
 dependencies {
 	compile('org.springframework:spring-core:3.2.0.RELEASE') {
 		exclude module: 'commons-logging'
@@ -27,6 +28,8 @@ dependencies {
 	runtime 'asm:asm:3.3.1'
 
 	testCompile 'org.spockframework:spock-core:0.7-groovy-1.8'
+
+	springIoVersions files('io-versions.properties')
 }
 
 test {

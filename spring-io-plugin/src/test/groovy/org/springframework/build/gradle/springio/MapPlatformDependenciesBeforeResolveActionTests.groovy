@@ -31,7 +31,16 @@ class MapPlatformDependenciesBeforeResolveActionTests extends Specification {
 		parent.version = 'nochange'
 
 		config = parent.configurations.create('configuration')
-		action = new MapPlatformDependenciesBeforeResolveAction(project: parent, configuration: config, resource: 'test-spring-io-dependencies')
+
+		Configuration versionsConfiguration = parent.configurations.create('versions')
+		def versionsFile = new File('src/test/resources/org/springframework/build/gradle/springio/test-spring-io-dependencies.properties').getAbsoluteFile()
+		def files = parent.files(versionsFile)
+		parent.dependencies {
+			versions files
+		}
+
+		action = new MapPlatformDependenciesBeforeResolveAction(project: parent, configuration: config,
+			versionsConfiguration: versionsConfiguration)
 
 		child = ProjectBuilder.builder().withName('child').withParent(parent).build()
 		child.group = parent.group
@@ -72,6 +81,23 @@ class MapPlatformDependenciesBeforeResolveActionTests extends Specification {
 			details.target.group == 'something'
 			details.target.name == 'unknown'
 			details.target.version == '1.0'
+	}
+
+	def "Action's versions can be overridden"() {
+		setup:
+			def versionsFile = new File('src/test/resources/org/springframework/build/gradle/springio/override-spring-io-dependencies.properties').getAbsoluteFile()
+			def files = parent.files(versionsFile)
+			parent.dependencies {
+				versions files
+			}
+			DependencyResolveDetails details = details('standardgroup:standardname:changeme')
+		when:
+			action.execute(Mock(ResolvableDependencies))
+			config.resolutionStrategy.dependencyResolveRule.execute(details)
+		then:
+			details.target.group == 'standardgroup'
+			details.target.name == 'standardname'
+			details.target.version == 'overriddenversion'
 	}
 
 	DependencyResolveDetails details(String path) {

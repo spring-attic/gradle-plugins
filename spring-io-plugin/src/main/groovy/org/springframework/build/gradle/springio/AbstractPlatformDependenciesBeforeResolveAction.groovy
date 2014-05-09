@@ -4,8 +4,6 @@ import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.Dependency;
-import org.gradle.api.artifacts.DependencyResolveDetails
 import org.gradle.api.artifacts.ModuleVersionSelector
 import org.gradle.api.artifacts.ResolvableDependencies
 import org.gradle.api.internal.artifacts.DefaultModuleVersionSelector
@@ -20,40 +18,34 @@ abstract class AbstractPlatformDependenciesBeforeResolveAction implements Action
 
 	Configuration configuration
 
-	String resource = 'spring-io-dependencies.properties'
+	Configuration versionsConfiguration
 
 	@Override
 	public void execute(ResolvableDependencies resolvableDependencies) {
-		Properties properties = new Properties()
-		Map<String, ModuleVersionSelector> selectors
-		getClass().getResource(resource).withInputStream { is ->
-			properties.load(is)
-		}
-		doExecute(resolvableDependencies, createSelectorsFromProperties(properties))
+		doExecute(resolvableDependencies, createSelectors())
 	}
 
 	abstract void doExecute(ResolvableDependencies resolvableDependencies, Map<String, ModuleVersionSelector> selectors)
 
-	/**
-	 * Uses the given Properties of the form {@code group:name=version} and returns a
-	 * {@code Map<String, ModuleVersionSelector>} where the keys are of the form {@code group:version} and the values
-	 * are ModuleVersion selectors created with {@code group}, {@code name}, and {@code version}.
-	 *
-	 * @param Properties The dependency information
-	 *
-	 * @return The map of selectors
-	 */
-	private Map<String, ModuleVersionSelector> createSelectorsFromProperties(Properties properties) {
-		Map<String,ModuleVersionSelector> depToSelector = [:]
-		properties.each { key, version ->
-			def (group, name) = key.split(':')
-			depToSelector.put("$group:$name" as String, new DefaultModuleVersionSelector(group, name, version))
+	private Map<String, ModuleVersionSelector> createSelectors() {
+		if (versionsConfiguration.incoming.files.empty) {
+			throw new InvalidUserDataException("At least one properties file must be a dependency of the $versionsConfiguration.name configuration")
 		}
-		depToSelector
+		Map<String, ModuleVersionSelector> selectors = [:]
+		versionsConfiguration.incoming.files.each {
+			Properties properties = new Properties()
+			it.withInputStream { is ->
+				properties.load(is)
+			}
+			properties.each { key, version ->
+				def (group, name) = key.split(':')
+				selectors.put("$group:$name" as String, new DefaultModuleVersionSelector(group, name, version))
+			}
+		}
+		selectors
 	}
 
 	protected Set<String> getIgnoredDependencies() {
 		project.rootProject.allprojects.collect { "$it.group:$it.name" as String }
 	}
-
 }

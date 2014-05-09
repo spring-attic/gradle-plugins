@@ -37,6 +37,10 @@ configure(allprojects) {
     repositories {
        maven { url "https://repo.spring.io/libs-snapshot" }
     }
+
+    dependencies {
+        springIoVersions 'io.spring.platform:platform-versions:1.0.0.BUILD-SNAPSHOT@properties'
+    }
 }
 ----
 
@@ -92,14 +96,35 @@ Typically users will keep the springIoCheck task separate so as to only run the 
 
 The plugin creates a new configuration, `springIoTestRuntime`, that contains all of the project's dependencies with
 their versions mapped to those that are in the platform. This configuration is used when running the additional
-tests.
+tests. The plugin uses another new configuration, `springIoVersions` to determine the versions. Typically, when
+configuring this configuration you will declare a single dependency upon a particular version of Spring IO. For
+example:
 
-You can use Gradle's built-in `dependencies` task to see details of the `springIoTestRuntime` configuration and the
-versions that it contains. For example:
+[source,groovy]
+----
+dependencies {
+    springIoVersions 'io.spring.platform:platform-versions:1.0.0.BUILD-SNAPSHOT@properties'
+}
+----
+
+You can declare more than one dependency in the `springIoVersions` configuration. In the event of a version being
+declared in more than one of the dependencies the last declaration wins. This allows you to override versions to,
+for example, help you to home in on the cause of a test failure:
+
+[source,groovy]
+----
+dependencies {
+    springIoVersions 'io.spring.platform:platform-versions:1.0.0.BUILD-SNAPSHOT@properties'
+    springIoVersions files('custom-versions.properties')
+}
+----
+
+You can use Gradle's built-in `dependencies` task to see details of the `springIoTestRuntime` configuration and
+the versions that it contains. For example:
 
 [source,bash]
 ----
-$ ./gradlew clean project-name:dependencies
+$ ./gradlew clean project-name:dependencies --configuration springIoTestRuntime
 ----
 
 == Additional Tests

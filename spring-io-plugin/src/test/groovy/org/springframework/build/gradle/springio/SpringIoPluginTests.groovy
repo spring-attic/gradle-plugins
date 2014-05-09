@@ -55,7 +55,15 @@ class SpringIoPluginTests extends Specification {
 			project.configurations.springIoTestRuntime.extendsFrom.contains(project.configurations.testRuntime)
 	}
 
-	def "Creates springioCheck Task"() {
+	def "Sets up springIoVersions configuration"() {
+		when:
+			project.apply plugin: SpringIoPlugin
+			project.apply plugin: JavaPlugin
+		then:
+			project.configurations.springIoVersions
+	}
+
+	def "Creates springIoCheck Task"() {
 		when:
 			project.apply plugin: SpringIoPlugin
 			project.apply plugin: JavaPlugin
@@ -65,7 +73,7 @@ class SpringIoPluginTests extends Specification {
 			sioc.taskDependencies.getDependencies(sioc) == [versionMappingCheckTask, springioTestTask, alternativeDependenciesTask, incompleteExcludesTask] as Set
 	}
 
-	def "Creates springioTest Task"() {
+	def "Creates springIoTest Task"() {
 		setup:
 			setupJdks()
 		when:
@@ -77,7 +85,7 @@ class SpringIoPluginTests extends Specification {
 			siot.taskDependencies.getDependencies(siot) == [jdk7TestTask, jdk8TestTask] as Set
 	}
 
-	def "Creates springioJDK7Test Task"() {
+	def "Creates springIoJDK7Test Task"() {
 		setup:
 			setupJdks()
 		when:
@@ -96,7 +104,7 @@ class SpringIoPluginTests extends Specification {
 			!jdk7TestTask
 	}
 
-	def "Creates springioJDK8Test Task"() {
+	def "Creates springIoJDK8Test Task"() {
 		setup:
 			setupJdks()
 		when:
@@ -107,7 +115,7 @@ class SpringIoPluginTests extends Specification {
 			jdk8TestTask.executable == java.absolutePath
 	}
 
-	def "Does not create springioJdk8Test if JDK8_HOME missing"() {
+	def "Does not create springIoJdk8Test if JDK8_HOME missing"() {
 		when:
 			project.apply plugin: SpringIoPlugin
 			project.apply plugin: JavaPlugin
