@@ -76,6 +76,16 @@ In addition to the steps listed above this will execute tasks that:
 * Run tests against your compiled code using JDK7 and JDK8 and the Spring IO dependency versions. For more information
 refer to <<additional-tests, Additional Tests>>
 
+If you have any customizations to your test task, you will want to ensure you customize the newly added springIoJdk7Test
+and springIoJdk8Test tasks. An example of configuring every test to have a specific system property can be seen below:
+
+[source,groovy]
+----
+project.tasks.withType(Test).all {
+    systemProperty 'some.prop', 'value'
+}
+----
+
 If you would like springIoCheck to be invoked when you run `./gradlew build`, then you can make the check task depend
 on springIoCheck as shown below:
 
