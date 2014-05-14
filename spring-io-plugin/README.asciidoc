@@ -10,7 +10,7 @@ Rob Winch
 :doctype: book
 
 == Overview
-Provides additional checks to ensure Spring IO platform compatibility
+Provides additional checks to ensure Spring IO Platform compatibility
 
 == Quick Start
 
@@ -31,28 +31,30 @@ buildscript {
 // ...
 
 configure(allprojects) {
-    apply plugin: 'spring-io'
-    
-    // necessary to resolve the Spring IO versions (which may include snapshots)
-    repositories {
-       maven { url "https://repo.spring.io/libs-snapshot" }
-    }
+    if (project.hasProperty('platformVersion')) {
+        apply plugin: 'spring-io'
+        
+        // necessary to resolve the Spring IO versions (which may include snapshots)
+        repositories {
+           maven { url "https://repo.spring.io/libs-snapshot" }
+        }
 
-    dependencies {
-        springIoVersions 'io.spring.platform:platform-versions:1.0.0.BUILD-SNAPSHOT@properties'
+        dependencies {
+            springIoVersions 'io.spring.platform:platform-versions:${platformVersion}@properties'
+        }
     }
 }
 ----
 
 NOTE: It is unlikely you will want to apply the plugin or snapshot repository to all projects. This is particularly
 true if you have sample projects within your project. Instead, you should limit the plugin to modules that are part of
-the Spring IO platform.
+the Spring IO Platform.
 
 Now you can run the following:
 
 [source,bash]
 ----
-$ ./gradlew clean springIoCheck
+$ ./gradlew clean springIoCheck -PplatformVersion=1.0.0.BUILD-SNAPSHOT
 ----
 
 This will execute tasks that:
@@ -68,7 +70,7 @@ Alternatively, you can run the following:
 
 [source,bash]
 ----
-$ ./gradlew clean springIoCheck -PJDK8_HOME=<jdk8-home> -PJDK7_HOME=<jdk7-home>
+$ ./gradlew clean springIoCheck -PplatformVersion=1.0.0.BUILD-SNAPSHOT -PJDK8_HOME=<jdk8-home> -PJDK7_HOME=<jdk7-home>
 ----
 
 In addition to the steps listed above this will execute tasks that:
@@ -105,17 +107,21 @@ Typically users will keep the springIoCheck task separate so as to only run the 
 == Spring IO dependencies
 
 The plugin creates a new configuration, `springIoTestRuntime`, that contains all of the project's dependencies with
-their versions mapped to those that are in the platform. This configuration is used when running the additional
+their versions mapped to those that are in the Platform. This configuration is used when running the additional
 tests. The plugin uses another new configuration, `springIoVersions` to determine the versions. Typically, when
-configuring this configuration you will declare a single dependency upon a particular version of Spring IO. For
-example:
+configuring this configuration you will declare a single dependency upon `platform-versions` using a property to
+control the version. For example:
 
 [source,groovy]
 ----
 dependencies {
-    springIoVersions 'io.spring.platform:platform-versions:1.0.0.BUILD-SNAPSHOT@properties'
+    springIoVersions 'io.spring.platform:platform-versions:${platformVersion}@properties'
 }
 ----
+
+The use of a property for the version, and requiring that property to be supplied on the command line, prevents
+there being a circular dependency between a project that's part of the Platform and the Platform itself. This allows
+us to easily check out a particular version of a project and test it against any version of the Platform.
 
 You can declare more than one dependency in the `springIoVersions` configuration. In the event of a version being
 declared in more than one of the dependencies the last declaration wins. This allows you to override versions to,
@@ -139,7 +145,7 @@ $ ./gradlew clean project-name:dependencies --configuration springIoTestRuntime
 
 == Additional Tests
 
-One of the goals of the Spring IO platform is to ensure modules work with JDK7 and JDK8 and that they run with specific
+One of the goals of the Spring IO Platform is to ensure modules work with JDK7 and JDK8 and that they run with specific
 versions of dependencies. Applying the plugin will create tests that:
 
 * Ensure that the Spring IO versions of dependencies are used at runtime for the additional test tasks
@@ -225,7 +231,7 @@ springIoDependencyVersionMappingCheck {
 `configuration` determines the configuration that is checked. `failOnUnmappedDirectDependency` controls whether or not
 the build will fail if a direct dependency is encountered that is not part of the Spring IO plaform. The default is
 `true`. `failOnUnmappedTransitiveDependency` controls whether or not the build will fail if a transitive dependency is
-encountered that is not part of the Spring IO platform. The default is `false`.
+encountered that is not part of the Spring IO Platform. The default is `false`.
 
 ==== Dealing with unmapped dependencies
 
