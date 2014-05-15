@@ -40,7 +40,7 @@ configure(allprojects) {
         }
 
         dependencies {
-            springIoVersions 'io.spring.platform:platform-versions:${platformVersion}@properties'
+            springIoVersions "io.spring.platform:platform-versions:${platformVersion}@properties"
         }
     }
 }
