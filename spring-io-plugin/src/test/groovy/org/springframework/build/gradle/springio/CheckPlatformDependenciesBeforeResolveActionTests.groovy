@@ -25,17 +25,19 @@ class CheckPlatformDependenciesBeforeResolveActionTests extends Specification {
 	CheckPlatformDependenciesBeforeResolveAction action
 
 	def setup() {
-		parent = ProjectBuilder.builder().withName("parent").build()
+		def projectDir = new File('.').absoluteFile
+		parent = ProjectBuilder.builder().withName("parent").withProjectDir(projectDir).build()
 		parent.group = 'thisprojectgroup'
 		parent.version = 'nochange'
 
 		config = parent.configurations.create('configuration')
 
+		parent.repositories { maven { url 'src/test/resources/test-maven-repository' } }
+
 		Configuration versionsConfiguration = parent.configurations.create('versions')
-		def versionsFile = new File('src/test/resources/org/springframework/build/gradle/springio/test-spring-io-dependencies.properties').getAbsoluteFile()
-		def files = parent.files(versionsFile)
+
 		parent.dependencies {
-			versions files
+			versions 'test:versions:1.0.0@properties'
 		}
 
 		action = new CheckPlatformDependenciesBeforeResolveAction(project: parent, configuration: config, versionsConfiguration: versionsConfiguration)

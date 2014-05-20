@@ -123,24 +123,58 @@ The use of a property for the version, and requiring that property to be supplie
 there being a circular dependency between a project that's part of the Platform and the Platform itself. This allows
 us to easily check out a particular version of a project and test it against any version of the Platform.
 
-You can declare more than one dependency in the `springIoVersions` configuration. In the event of a version being
-declared in more than one of the dependencies the last declaration wins. This allows you to override versions to,
-for example, help you to home in on the cause of a test failure:
-
-[source,groovy]
-----
-dependencies {
-    springIoVersions 'io.spring.platform:platform-versions:1.0.0.BUILD-SNAPSHOT@properties'
-    springIoVersions files('custom-versions.properties')
-}
-----
-
 You can use Gradle's built-in `dependencies` task to see details of the `springIoTestRuntime` configuration and
 the versions that it contains. For example:
 
 [source,bash]
 ----
 $ ./gradlew clean project-name:dependencies --configuration springIoTestRuntime
+----
+
+=== Overriding versions
+
+To override versions you can declare more than one dependency in the `springIoVersions` configuration. In the event
+of a version being declared in more than one of the dependencies, the last declaration wins. You _must_ use a
+repository as the source for a second or subsequent dependency. This is due to Gradle's handling of
+http://www.gradle.org/docs/current/userguide/dependency_management.html#sub:file_dependencies[direct file
+dependencies] which are always processed first irrespective of the position in which they were declared. If you
+wish to use a local file, you can do so by using a local Maven repository or a flat directory repository.
+
+Using the following file structure:
+
+```
+├── local-repository
+│   └── com
+│       └── example
+│           └── custom-versions
+|               └── 1.0.0
+|                   └── custom-versions-1.0.0.properties
+└── flat-repository
+    └── flat-repository-versions.properties
+```
+
+You can reference the local versions properties files with the following Gradle configuration: 
+
+[source,groovy]
+----
+repositories {
+
+    …
+
+    maven {
+        url 'local-repository'
+    }
+
+    flatDir {
+        dirs 'flat-repository'
+    }
+}
+
+dependencies {
+    springIoVersions 'io.spring.platform:platform-versions:1.0.0.BUILD-SNAPSHOT@properties'
+    springIoVersions 'com.example:custom-versions:1.0.0@properies'
+    springIoVersions ':flat-repository-versions@properties' // No group or version is needed
+}
 ----
 
 == Additional Tests

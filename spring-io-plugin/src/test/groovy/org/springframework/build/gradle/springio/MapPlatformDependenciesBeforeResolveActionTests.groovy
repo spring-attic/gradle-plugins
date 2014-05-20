@@ -26,17 +26,19 @@ class MapPlatformDependenciesBeforeResolveActionTests extends Specification {
 	AbstractPlatformDependenciesBeforeResolveAction action
 
 	def setup() {
-		parent = ProjectBuilder.builder().withName("parent").build()
+		def projectDir = new File('.').absoluteFile
+		parent = ProjectBuilder.builder().withName("parent").withProjectDir(projectDir).build()
 		parent.group = 'thisprojectgroup'
 		parent.version = 'nochange'
+
+		parent.repositories { maven { url 'src/test/resources/test-maven-repository' } }
+		parent.repositories { flatDir { dirs 'src/test/resources/test-flat-repository' } }
 
 		config = parent.configurations.create('configuration')
 
 		Configuration versionsConfiguration = parent.configurations.create('versions')
-		def versionsFile = new File('src/test/resources/org/springframework/build/gradle/springio/test-spring-io-dependencies.properties').getAbsoluteFile()
-		def files = parent.files(versionsFile)
 		parent.dependencies {
-			versions files
+			versions 'test:versions:1.0.0@properties'
 		}
 
 		action = new MapPlatformDependenciesBeforeResolveAction(project: parent, configuration: config,
@@ -83,21 +85,46 @@ class MapPlatformDependenciesBeforeResolveActionTests extends Specification {
 			details.target.version == '1.0'
 	}
 
-	def "Action's versions can be overridden"() {
+	def "Action's versions can be overridden with Maven repository artifact"() {
 		setup:
-			def versionsFile = new File('src/test/resources/org/springframework/build/gradle/springio/override-spring-io-dependencies.properties').getAbsoluteFile()
-			def files = parent.files(versionsFile)
 			parent.dependencies {
-				versions files
+				versions "test:override-versions:1.0.0@properties"
 			}
-			DependencyResolveDetails details = details('standardgroup:standardname:changeme')
+			DependencyResolveDetails details1 = details('standardgroup:standardname:changeme')
+			DependencyResolveDetails details2 = details('standardgroup:standardothername:changeme')
 		when:
 			action.execute(Mock(ResolvableDependencies))
-			config.resolutionStrategy.dependencyResolveRule.execute(details)
+			config.resolutionStrategy.dependencyResolveRule.execute(details1)
+			config.resolutionStrategy.dependencyResolveRule.execute(details2)
 		then:
-			details.target.group == 'standardgroup'
-			details.target.name == 'standardname'
-			details.target.version == 'overriddenversion'
+			details1.target.group == 'standardgroup'
+			details1.target.name == 'standardname'
+			details1.target.version == 'overriddenversion'
+			details2.target.group == 'standardgroup'
+			details2.target.name == 'standardothername'
+			details2.target.version == 'standardversion'
+
+	}
+
+	def "Action's versions can be overridden with flat directory repository artifact"() {
+		setup:
+			parent.dependencies {
+				versions ':flat-versions@properties'
+			}
+			DependencyResolveDetails details1 = details('standardgroup:standardname:changeme')
+			DependencyResolveDetails details2 = details('standardgroup:standardothername:changeme')
+		when:
+			action.execute(Mock(ResolvableDependencies))
+			config.resolutionStrategy.dependencyResolveRule.execute(details1)
+			config.resolutionStrategy.dependencyResolveRule.execute(details2)
+		then:
+			details1.target.group == 'standardgroup'
+			details1.target.name == 'standardname'
+			details1.target.version == 'flatversion'
+			details2.target.group == 'standardgroup'
+			details2.target.name == 'standardothername'
+			details2.target.version == 'standardversion'
+
 	}
 
 	DependencyResolveDetails details(String path) {
