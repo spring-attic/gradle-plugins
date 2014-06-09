@@ -36,8 +36,8 @@ class PropDepsIdeaPlugin implements Plugin<Project> {
 		project.idea.module {
 			// IDEA internally deals with 4 scopes : COMPILE, TEST, PROVIDED, RUNTIME
 			// but only PROVIDED seems to be picked up
-			scopes.PROVIDED.plus += project.configurations.provided
-			scopes.PROVIDED.plus += project.configurations.optional
+			scopes.PROVIDED.plus += [project.configurations.provided]
+			scopes.PROVIDED.plus += [project.configurations.optional]
 		}
 	}
 }
