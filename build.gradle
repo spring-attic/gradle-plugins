@@ -42,67 +42,8 @@ project(':bundlor-plugin') {
     // dependencies are configured within BundlorPlugin
 }
 
-project(':docbook-reference-plugin') {
-    version = docbookPluginVersion
-    dependencies {
-        compile 'net.sf.docbook:docbook-xsl:1.75.2:resources@zip'
-        compile 'net.sf.docbook:docbook-xml:5.0:xsd-resources@zip'
-        compile 'net.sf.docbook:docbook-xsl-saxon:1.0.0'
-        compile 'org.apache.xerces:resolver:2.9.1'
-        compile 'org.apache.xerces:xercesImpl:2.9.1'
-        compile 'saxon:saxon:6.5.3'
-        compile 'net.sf.xslthl:xslthl:2.0.1'
-        compile 'org.apache.xmlgraphics:fop:0.95-1@jar'
-        compile 'org.apache.xmlgraphics:xmlgraphics-commons:1.3'
-        compile 'org.apache.xmlgraphics:batik-bridge:1.7@jar'
-        compile 'org.apache.xmlgraphics:batik-util:1.7@jar'
-        compile 'org.apache.xmlgraphics:batik-css:1.7@jar'
-        compile 'org.apache.xmlgraphics:batik-dom:1.7'
-        compile 'org.apache.xmlgraphics:batik-svg-dom:1.7@jar'
-        compile 'org.apache.avalon.framework:avalon-framework-api:4.3.1'
-    }
-
-    task copyDocbookResources {
-        outputs.dir "${project.buildDir}/docbook"
-
-        doLast() {
-            def docbookZip = configurations.compile.files.find { file -> file.name.contains('docbook-xsl-')};
-
-            copy { // copy all images and highlighting files from docbook dist
-                from zipTree(docbookZip)
-                include 'docbook/images/**'
-                include 'docbook/highlighting/**'
-                into project.buildDir
-            }
-
-            copy { // copy docbook resources from src/main
-                from 'src/main/docbook'
-                into "${project.buildDir}/docbook"
-            }
-        }
-    }
-
-
-    task docbookResourcesZip(type: Zip, dependsOn: copyDocbookResources) {
-        from copyDocbookResources.outputs.files
-        destinationDir = new File(project.sourceSets.main.output.classesDir, "META-INF")
-        archiveName = 'docbook-resources.zip'
-    }
-
-    jar.dependsOn docbookResourcesZip
-}
-
-
 ext.repoUser = project.properties['REPO_USERNAME']
 ext.repoPass = project.properties['REPO_PASSWORD']
-
-gradle.taskGraph.whenReady {taskGraph ->
-    if (taskGraph.hasTask(':docbook-reference-plugin:artifactoryPublish') &&
-            (repoUser == null || repoPass == null)) {
-        logger.warn("WARNING: artifactoryPublish task specified but REPO_USERNAME " +
-            "and REPO_PASSWORD properties have not been provided. Authorization may fail.")
-    }
-}
 
 artifactory {
     contextUrl = 'https://repo.spring.io'
