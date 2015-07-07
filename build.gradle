@@ -29,14 +29,6 @@ subprojects {
     }
 }
 
-project(':spring-io-plugin') {
-    version = springIoPluginVersion
-
-    dependencies {
-        testCompile 'org.spockframework:spock-core:0.7-groovy-1.8'
-    }
-}
-
 project(':bundlor-plugin') {
     version = bundlorPluginVersion
     // dependencies are configured within BundlorPlugin
