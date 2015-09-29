@@ -2,6 +2,10 @@
 Provides additional `optional` and `provided` dependency configurations for Gradle
 along with Maven POM generation support.
 
+NB: This plugin does not work with the new maven-publish plugin, and thus also
+not with other publishing plugins based on this, such as the Bintray and
+artifactory plugins.
+
 ## Configuration
 See [tags][1] to determine the
 latest available version. Then configure the plugin in your project as
