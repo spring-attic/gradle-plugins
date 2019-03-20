@@ -8,8 +8,8 @@ import org.gradle.api.logging.LogLevel
  *
  * @author Chris Beams
  * @author Luke Taylor
- * @see http://www.springsource.org/bundlor
- * @see http://static.springsource.org/s2-bundlor/1.0.x/user-guide/html/ch04s02.html
+ * @see https://www.springsource.org/bundlor
+ * @see https://docs.spring.io/s2-bundlor/1.0.x/user-guide/html/ch04s02.html
  */
 public class BundlorPlugin implements Plugin<Project> {
 
